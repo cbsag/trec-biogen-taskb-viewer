@@ -5,345 +5,303 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TREC BioGen 2025 — Task B</title>
   <style>
+    /* ---------- THEME ---------- */
     :root{
-      /* dark theme (default) */
-      --bg:#0d0f1a; --bg2:#10142a; --card:#141a33; --text:#e8ecff; --muted:#a7b4dd;
-      --accent:#7c3aed; --accent-weak:#32215a; --border:#1f284c; --border-2:#2a3560;
+      --bg:#0b0e16; --bg2:#0f1428; --card:#151c34; --text:#e8ecff; --muted:#a7b4dd;
+      --line:#212b4f; --line2:#273463; --accent:#7c3aed; --accent-weak:#2e2058;
+      --chip:#101739; --chip-bd:#2a3560; --pill:#211948; --pill-bd:#3c2d74;
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
     }
-    body.light{
-      /* light theme */
-      --bg:#f6f7fb; --bg2:#ffffff; --card:#ffffff; --text:#0e1330; --muted:#49547a;
-      --accent:#6b46c1; --accent-weak:#efe9ff; --border:#dfe4f5; --border-2:#cfd7f0;
+    [data-theme="light"]{
+      --bg:#f6f7fb; --bg2:#f2f3f9; --card:#ffffff; --text:#1c2340; --muted:#5a6a99;
+      --line:#e6e9f3; --line2:#dfe4f3; --accent:#6d28d9; --accent-weak:#efe9ff;
+      --chip:#ffffff; --chip-bd:#e6e9f3; --pill:#ffffff; --pill-bd:#e6e9f3;
+      --shadow: 0 8px 20px rgba(2,6,23,.08);
     }
 
     *{box-sizing:border-box}
-    body{ margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
-      color:var(--text); background:var(--bg); }
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
+      color:var(--text); background:var(--bg);
+    }
 
-    /* --- global animated background --- */
-    #anim, #bgLines{ position:fixed; inset:0; pointer-events:none; z-index:0 }
-    #anim{
+    /* ---------- GLOBAL BACKGROUND ANIMATION (both pages) ---------- */
+    .bgfx{position:fixed; inset:0; z-index:-2; overflow:hidden}
+    .bgfx::before{
+      content:""; position:absolute; inset:-20% -10% -10% -10%;
       background:
-        radial-gradient(40% 60% at 20% 10%, #1b1f46 0%, transparent 60%),
-        radial-gradient(40% 50% at 80% 0%, #2a2160 0%, transparent 60%),
-        radial-gradient(30% 60% at 60% 90%, #151b44 0%, transparent 60%),
-        radial-gradient(20% 30% at 10% 80%, #2c114b 0%, transparent 60%);
-      filter:blur(30px);animation:float 16s ease-in-out infinite alternate; opacity:.7
+        radial-gradient(40% 60% at 20% 20%, #1b2050 0%, transparent 60%),
+        radial-gradient(40% 50% at 80% 10%, #2a2160 0%, transparent 60%),
+        radial-gradient(30% 60% at 60% 90%, #171d48 0%, transparent 60%),
+        radial-gradient(20% 30% at 10% 85%, #2c114b 0%, transparent 60%);
+      filter:blur(38px); animation:float 16s ease-in-out infinite alternate;
+      opacity:.65;
+    }
+    .bgfx .wavy{
+      position:absolute; inset:0; pointer-events:none;
+      background:
+        repeating-linear-gradient( to bottom,
+          transparent 0 14px, rgba(124,58,237,.04) 14px 28px),
+        radial-gradient(1200px 400px at -200px 50%, rgba(124,58,237,.11), transparent 70%),
+        radial-gradient(1200px 400px at 120% 40%, rgba(124,58,237,.11), transparent 70%);
+      -webkit-mask:
+        linear-gradient(90deg, transparent 0 6%, #000 6% 11%, transparent 11% 17%,
+                               #000 17% 22%, transparent 22% 28%, #000 28% 33%,
+                               transparent 33% 67%, #000 67% 72%, transparent 72% 78%,
+                               #000 78% 83%, transparent 83% 100%);
+      animation:drift 22s linear infinite;
+      opacity:.5;
     }
     @keyframes float{to{transform:translateY(-18px) scale(1.02)}}
+    @keyframes drift{to{background-position:0 260px, 0 0, 0 0}}
 
+    /* ---------- HEADER ---------- */
     header{
-      position:sticky;top:0;z-index:5;padding:12px 24px;border-bottom:1px solid var(--border);
-      background:color-mix(in oklab, var(--bg) 85%, transparent); backdrop-filter:blur(6px);
-      transition:transform .35s ease, opacity .35s ease;
+      position:sticky; top:0; z-index:10; border-bottom:1px solid var(--line);
+      background:rgba(11,14,22,.65); backdrop-filter:blur(6px); transition:opacity .25s;
     }
-    .header--hidden{ transform: translateY(-100%); opacity: 0; pointer-events: none; }
-    h1{margin:0;font-size:20px}
-    .nav{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted)}
-    .nav a{color:color-mix(in oklab, var(--accent) 70%, #cdb8ff);text-decoration:none;padding:6px 8px;border-radius:8px}
-    .nav a.active{ background:color-mix(in oklab, var(--accent) 18%, var(--bg2)); border:1px solid var(--accent) }
-    .nav a:hover{text-decoration:underline}
-    .themeBtn{ margin-left:6px;border-radius:999px;border:1px solid var(--border-2); background:var(--bg2); color:var(--text);
-      padding:6px 10px; cursor:pointer; font-size:13px; }
+    [data-theme="light"] header{background:rgba(255,255,255,.7)}
+    header.hidden{opacity:0; pointer-events:none}
+    .nav{max-width:1100px;margin:0 auto;padding:14px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+    .nav h1{margin:0;font-size:18px;font-weight:700}
+    .nav a{color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:10px}
+    .nav a.active{color:var(--text); background:var(--pill); border:1px solid var(--pill-bd)}
+    .spacer{flex:1}
+    .toggle{cursor:pointer;border:1px solid var(--line2);background:var(--chip);padding:6px 9px;border-radius:999px}
 
-    .container{max-width:1100px;margin:0 auto;padding:16px 24px 24px; position:relative; z-index:1}
+    /* ---------- CONTAINERS ---------- */
+    .container{max-width:1100px;margin:0 auto;padding:16px 24px 24px}
 
-    /* landing */
-    #landing{ position:relative; height:72vh; display:flex; align-items:center; justify-content:center; }
-    .hero{position:relative;text-align:center;z-index:1}
-    .hero h2{font-size:46px;margin:0 0 10px}
-    .hero p{color:var(--muted);margin:0 0 18px}
-    .hero .cta{
-      font-size:16px;padding:10px 16px;border-radius:12px;border:1px solid var(--border-2);
-      background:linear-gradient(90deg,#2b1e52,#291e68);color:#fff;cursor:pointer
-    }
-    body.light .hero .cta{ background:linear-gradient(90deg,#efe9ff,#e3ddff); color:#2a2260; }
-    .hero .cta:hover{box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent)}
-    .scroll-tip{ position:absolute; bottom:28px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12px }
+    /* ---------- LANDING ---------- */
+    #landing{min-height:72vh;display:flex;align-items:center;justify-content:center;position:relative}
+    .hero{position:relative;text-align:center; margin-top:8vh}
+    .hero h2{font-size:44px;margin:0 0 8px}
+    .hero p{color:var(--muted);margin:0 0 22px}
+    .cta{font-size:16px;padding:10px 16px;border-radius:12px;border:1px solid var(--line2);
+         background:linear-gradient(90deg,#2b1e52,#291e68);color:#fff;cursor:pointer}
+    [data-theme="light"] .cta{background:linear-gradient(90deg,#eae2ff,#efeaff); color:#41298d}
+    .cta:hover{box-shadow:0 0 0 3px rgba(124,58,237,.25)}
 
-    /* cards & content */
-    .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px}
+    .footer{text-align:center;color:var(--muted);padding:28px 24px;font-size:13px}
+    .footer a{color:var(--text);text-decoration:none}
+
+    /* ---------- PANELS & FORMS ---------- */
+    .panel{background:var(--card);border:1px solid var(--line2);border-radius:16px;padding:18px;margin-bottom:18px; box-shadow:var(--shadow)}
     .row{display:flex;gap:12px;flex-wrap:wrap}
     .grow{flex:1}
-    input[type="text"]{
-      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border-2);background:var(--bg2);color:var(--text)
-    }
-    input[type="text"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent)}
-    .systems{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid var(--border-2);background:var(--bg2);cursor:pointer}
-    .chip input{accent-color:var(--accent)}
+    input[type="text"]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--text)}
+    input[type="text"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.25); outline:none}
+    .btn{font-size:14px;padding:9px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--text);cursor:pointer}
+    .btn:hover{background:var(--accent-weak);border-color:var(--accent)}
     .muted{color:var(--muted);font-size:13px}
 
-    .result{border-top:1px solid color-mix(in oklab, var(--border) 90%, transparent);padding-top:16px;margin-top:16px}
+    .filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .filters .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid var(--chip-bd);background:var(--chip)}
+    .filters .chip input{accent-color:var(--accent)}
+    .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .select{border:1px solid var(--line2);background:var(--bg2);color:var(--text);border-radius:8px;padding:6px 8px}
+
+    /* ---------- RESULTS ---------- */
+    .result{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}
     .qid{font-weight:700;font-size:12px;color:var(--muted)}
     .qt{font-size:18px;font-weight:800;margin:6px 0 4px}
     .topic{font-size:13px;color:var(--muted)}
-
-    /* narrative summary style (legible in light & dark) */
-    details{margin-top:8px}
-    details summary{
-      display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px;
-      background:var(--bg2); border:1px solid var(--border-2); color:var(--text); cursor:pointer;
-    }
-    details[open] summary{ background:color-mix(in oklab, var(--accent) 12%, var(--bg2)); border-color:var(--accent); }
-    details summary:hover{ border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent); }
+    details{margin-top:8px} summary{cursor:pointer;color:var(--muted)}
+    summary:hover{color:var(--text)}
 
     .answers{margin-top:14px}
-    .card{background:color-mix(in oklab, var(--card) 90%, var(--bg2));border:1px solid var(--border);border-radius:12px;padding:14px}
+    .card{background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:14px}
     .sys{font-weight:800;margin-bottom:10px;font-size:13px}
 
     .ans{line-height:1.65}
-    .srow{margin:10px 0;padding:10px 12px;background:var(--bg2);border:1px solid var(--border-2);border-radius:10px}
-    .srow .bullet{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px;transform:translateY(-1px)}
+    .srow{margin:10px 0;padding:10px 12px;background:var(--card);border:1px solid var(--line2);border-radius:10px}
+    .srow .bullet{display:inline-block;width:8px;height:8px;border-radius:50%;background:#7c3aed;margin-right:8px;transform:translateY(-1px)}
     .srow .text{display:inline}
+    .srow .pmids{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+    .pill{font-size:12px;border:1px solid var(--line2);background:var(--bg2);padding:3px 8px;border-radius:999px}
     .srow .actions{display:inline-flex;gap:8px;margin-left:8px}
-
-    .btn{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--border-2);background:var(--bg2);color:var(--text);cursor:pointer}
-    .btn:hover{background:var(--accent-weak);border-color:var(--accent); color:#fff}
-    body.light .btn:hover{ color:#fff }
+    .link{color:#cdb8ff;text-decoration:none}
+    .link:hover{text-decoration:underline}
 
     .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-    .tab{padding:6px 10px;border-radius:10px;border:1px solid var(--border-2);background:var(--bg2);cursor:pointer;transition:background .15s,border-color .15s}
-    .tab.active{background:color-mix(in oklab, var(--accent) 15%, var(--bg2));border-color:var(--accent)}
-    .tab:hover{ border-color:var(--accent); }
+    .tab{padding:6px 10px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);cursor:pointer}
+    .tab.active{background:var(--pill);border-color:var(--accent)}
     .tabcontent{display:none}
     .tabcontent.active{display:block}
 
     .spinner-wrap{display:flex;gap:10px;align-items:center;justify-content:center;padding:24px}
-    .spinner{width:16px;height:16px;border-radius:50%;border:3px solid #263154;border-top-color:#b392ff;animation:spin .9s linear infinite}
+    .spinner{width:16px;height:16px;border-radius:50%;border:3px solid var(--line2);border-top-color:#b392ff;animation:spin .9s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
-    .select{border:1px solid var(--border-2);background:var(--bg2);color:var(--text);border-radius:8px;padding:6px 8px}
+    .citation-list{margin:10px 0 0 0; padding:0}
+    .citation-card{list-style:none; margin:10px 0; padding:12px 12px; border:1px solid var(--line2);
+                   background:var(--card); border-radius:10px}
+    .citation-card summary{color:var(--muted)}
+    .absbox{margin-top:8px; padding:10px 12px; border-radius:10px; background:var(--bg2); border:1px solid var(--line2); white-space:pre-wrap}
 
-    .filtersBar{ display:none; margin-top:10px }
-    .filtersBar.open{ display:block }
-    .filtersToggle{ margin-left:auto }
-
-    /* per-sentence PMIDs */
-    .citebar{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:6px }
-    .pmidchip{ display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--border-2);
-      background:var(--bg2); color:var(--text); text-decoration:none }
-    .pmidchip:hover{ border-color:var(--accent) }
-
-    .footer{ text-align:center;color:var(--muted);padding:26px 24px;font-size:13px;border-top:1px solid var(--border) }
-    .footer a{ color:color-mix(in oklab, var(--accent) 70%, #cdb8ff); text-decoration:none }
-    .footer a:hover{text-decoration:underline}
+    .hide{display:none}
   </style>
 </head>
 <body>
-  <!-- global animated bg -->
-  <div id="anim"></div>
-  <canvas id="bgLines"></canvas>
+  <div class="bgfx"><div class="wavy"></div></div>
 
-  <!-- header (hidden until interact) -->
-  <header id="topHeader" class="header--hidden">
-    <div class="container">
-      <div class="nav">
-        <h1 style="margin-right:auto;">TREC BioGen 2025 — Task B</h1>
-        <a href="#home" id="navHome">Home</a>
-        <a href="#task" id="navTask">Task</a>
-        <a href="#viewer" id="navViewer">Viewer</a>
-        <a href="https://github.com/cbsag" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a>
-        <button id="themeToggle" class="themeBtn" title="Toggle light/dark">🌙</button>
-      </div>
-    </div>
+  <header id="siteHeader" class="hidden">
+    <nav class="nav">
+      <h1>TREC BioGen 2025 — Task B</h1>
+      <a href="#home" id="navHome">Home</a>
+      <a href="#task" id="navTask">Task</a>
+      <a href="#viewer" id="navViewer">Viewer</a>
+      <span class="spacer"></span>
+      <a href="https://github.com/cbsag/trec-biogen-taskb-viewer" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a>
+      <button class="toggle" id="themeToggle" title="Toggle light / dark">🌙</button>
+    </nav>
   </header>
 
-  <!-- landing -->
+  <!-- LANDING -->
   <section id="landing" class="container">
-    <div class="hero" id="hero1">
-      <h2>TREC BioGen 2025 — Task B</h2>
+    <div class="hero">
+      <h2 id="heroTitle">TREC BioGen 2025 — Task B</h2>
       <p>Generate answers for 30 medical questions and compare systems.</p>
-      <!-- <div class="scroll-tip">scroll / swipe to continue</div> -->
-    </div>
-    <div class="hero" id="hero2" style="display:none">
-      <h2>Biomedical QA, grounded &amp; comparable</h2>
-      <p>Compare system answers sentence-by-sentence with PubMed citations.</p>
       <button class="cta" id="openViewerBtn">Open Viewer</button>
     </div>
   </section>
 
-  <!-- task page -->
-  <section id="task" class="container" style="display:none">
+  <!-- TASK PAGE -->
+  <section id="task" class="container hide">
     <div class="panel">
-      <h3 style="margin:0 0 8px">TREC 2025 Biomedical Generative Retrieval (BioGen)</h3>
-      <div class="muted" style="line-height:1.7">
-        <p><strong>Goal.</strong> Reduce hallucinations in biomedical QA by grounding answers with PubMed citations.</p>
-        <ul>
-          <li><strong>Task A — Grounding:</strong> For each answer sentence, provide up to <em>3</em> new supporting PMIDs and up to <em>3</em> contradicting PMIDs (existing PMIDs provided).</li>
-          <li><strong>Task B — Reference Attribution:</strong> Generate an answer ≤250 words; include up to <em>3</em> PMIDs per sentence from the official PubMed corpus.</li>
-        </ul>
-        <p><strong>Timeline.</strong> Dataset &amp; baseline: June&nbsp;2&nbsp;2025 · Submissions: Aug&nbsp;15 · Results: late Sep · Notebook: late Oct · TREC: Nov&nbsp;17–21.</p>
-        <p><strong>Submission format (Task B excerpt).</strong></p>
-<pre style="white-space:pre-wrap;background:var(--bg2);border:1px solid var(--border-2);border-radius:10px;padding:10px;margin:8px 0">
-{
-  "metadata": { "team_id": "...", "run_id": "...", "topic_id": "..." },
-  "responses": [
-    { "text": "Sentence 1.", "citations": ["PMID1","PMID2","PMID3"] },
-    { "text": "Sentence 2.", "citations": ["PMID4","PMID5"] }
-  ]
-}
-</pre>
-        <p><strong>PubMed E-utilities etiquette.</strong> Include <code>tool</code> and <code>email</code>; max ~3 rps (10 rps with API key). This app uses <code>ESearch/ESummary</code> for hints and <code>EFetch</code> to show titles/abstracts for cited PMIDs.</p>
-        <p><a href="https://trec-biogen.github.io/docs/#task-description" target="_blank" rel="noopener">Official task description ↗</a></p>
-      </div>
+      <h3 style="margin:0 0 8px">Task Description (summary)</h3>
+      <p class="muted" style="margin-top:0">
+        BioGen 2025 has two subtasks.
+      </p>
+      <ul>
+        <li><b>Task A — Grounding Answer:</b> For each <i>given</i> answer sentence, add up to <b>3 new PMIDs</b> that support it
+            (prior supported PMIDs are provided) and up to <b>3 PMIDs that contradict</b> it. PMIDs must come from the released PubMed snapshot.</li>
+        <li><b>Task B — Reference Attribution:</b> For each topic, generate an answer (≤ 250 words). Each sentence may include up to
+            <b>3 PMIDs</b> from the released PubMed snapshot that support the statement.</li>
+      </ul>
+      <p class="muted">Key dates: Dataset & baseline June 2, submissions Aug 15, results late Sep, papers late Oct, conference Nov 17–21.</p>
+      <p><a class="link" href="https://trec-biogen.github.io/docs/#task-description" target="_blank" rel="noopener">Official BioGen 2025 page →</a></p>
     </div>
   </section>
 
-  <!-- viewer -->
-  <div class="container" id="viewer" style="display:none">
+  <!-- VIEWER -->
+  <section id="viewer" class="container hide">
     <div class="panel">
-      <!-- search row -->
       <div class="row">
         <div class="grow">
           <input id="q" type="text" placeholder="Search by ID, question, topic, or narrative… (e.g., ‘axonal injury’ or ‘181’)" />
         </div>
-        <button id="searchBtn" class="btn" title="Search (Enter)">Search</button>
-        <button id="filtersBtn" class="btn filtersToggle" title="Show/Hide filters">⚙️ Filters</button>
+        <button class="btn" id="searchBtn">Search</button>
+        <button class="btn" id="toggleFiltersBtn">Hide Filters</button>
       </div>
 
-      <!-- filters -->
-      <div id="filtersBar" class="filtersBar">
-        <div class="row" style="margin-top:10px">
-          <div class="systems" id="systems"></div>
-          <label class="chip" title="Automatically query PubMed for the first few sentences (rate-limited)">
-            <input type="checkbox" id="autoCiteToggle" />
-            <span>Auto-cite sentences (PubMed)</span>
-          </label>
-          <div class="toolbar">
-            <label class="muted">View</label>
-            <select id="viewMode" class="select">
-              <option value="auto" selected>Auto (Tabs if multiple)</option>
-              <option value="tabs">Tabs</option>
-              <option value="columns">Columns</option>
-            </select>
-            <label class="muted">Text size</label>
-            <select id="textSize" class="select">
-              <option value="1.55">Comfort</option>
-              <option value="1.65" selected>Relaxed</option>
-              <option value="1.8">Spacious</option>
-            </select>
-          </div>
+      <div id="filters" class="row" style="margin-top:10px">
+        <div class="filters" id="systems"></div>
+
+        <div class="toolbar">
+          <label class="muted">View</label>
+          <select id="viewMode" class="select">
+            <option value="auto" selected>Auto (Tabs if multiple)</option>
+            <option value="tabs">Tabs</option>
+            <option value="columns">Columns</option>
+          </select>
+
+          <label class="muted">Text size</label>
+          <select id="textSize" class="select">
+            <option value="1.55">Comfort</option>
+            <option value="1.65" selected>Relaxed</option>
+            <option value="1.8">Spacious</option>
+          </select>
         </div>
         <div class="muted" id="meta" style="margin-top:6px"></div>
       </div>
 
-      <div id="results"></div>
+      <div id="results" class="panel" style="margin:12px 0 0 0">
+        <div class="muted">Type a query and press <b>Search</b>.</div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="footer">
-    ~ cbsag ·
-    <a href="https://github.com/cbsag" target="_blank" rel="noopener">GitHub</a> ·
-    <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a>
-  </div>
+  <div class="footer">~ cbsag · <a href="https://github.com/cbsag" target="_blank" rel="noopener">GitHub</a> ·
+    <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a></div>
 
   <script>
-    /* ---------- THEME ---------- */
-    const themeBtn = document.getElementById('themeToggle');
-    function applyTheme(t){ document.body.classList.toggle('light', t==='light'); themeBtn.textContent = t==='light' ? '☀️' : '🌙'; localStorage.setItem('biogen_theme', t); }
-    applyTheme(localStorage.getItem('biogen_theme') || 'dark');
-    themeBtn.addEventListener('click', ()=>{ applyTheme(document.body.classList.contains('light') ? 'dark' : 'light'); });
-
-    /* ---------- animated lines bg ---------- */
-    (function linesBG(){
-      const cvs = document.getElementById('bgLines'); if(!cvs) return;
-      const ctx = cvs.getContext('2d',{alpha:true});
-      let w=0,h=0, t=0, raf;
-      function size(){ const r = window.devicePixelRatio||1; w=window.innerWidth; h=window.innerHeight; cvs.width=w*r; cvs.height=h*r; ctx.setTransform(r,0,0,r,0,0); }
-      function draw(){
-        ctx.clearRect(0,0,w,h);
-        const cols = 8, spacing = w/(cols+1);
-        for(let i=0;i<=cols;i++){
-          const x = i*spacing + Math.sin((t/700)+(i*0.6))*15;
-          ctx.lineWidth = 1.2;
-          const g = ctx.createLinearGradient(x,0,x,h);
-          g.addColorStop(0,'#6d5bd0'); g.addColorStop(.5,'#7c3aed'); g.addColorStop(1,'#3f2a99');
-          ctx.strokeStyle = g; ctx.beginPath();
-          for(let y=0;y<=h;y+=12){ const off = Math.sin((y*0.02)+(i*0.8)+(t/900))*10; ctx.lineTo(x+off, y); }
-          ctx.stroke();
-        }
-        t = performance.now(); raf = requestAnimationFrame(draw);
-      }
-      window.addEventListener('resize', size); size(); draw();
-      window.addEventListener('visibilitychange', ()=>{ if(document.hidden){ cancelAnimationFrame(raf); } else { t=performance.now(); draw(); }});
-    })();
-
-    /* ---------- elements ---------- */
+    /* ====== ELEMENTS ====== */
+    const header = document.getElementById('siteHeader');
     const systemsDiv = document.getElementById("systems");
     const resultsDiv = document.getElementById("results");
     const metaDiv = document.getElementById("meta");
     const qInput = document.getElementById("q");
-
-    const landing = document.getElementById('landing');
-    const viewer  = document.getElementById('viewer');
-    const taskSec = document.getElementById('task');
-    const headerEl = document.getElementById('topHeader');
-    const hero1 = document.getElementById('hero1');
-    const hero2 = document.getElementById('hero2');
-    const openBtn = document.getElementById('openViewerBtn');
-    const navHome = document.getElementById('navHome');
-    const navTask = document.getElementById('navTask');
-    const navViewer = document.getElementById('navViewer');
-    const textSizeSel = document.getElementById('textSize');
+    const searchBtn = document.getElementById("searchBtn");
+    const toggleFiltersBtn = document.getElementById("toggleFiltersBtn");
+    const filtersWrap = document.getElementById("filters");
     const viewModeSel = document.getElementById('viewMode');
-    const searchBtn = document.getElementById('searchBtn');
-    const filtersBtn = document.getElementById('filtersBtn');
-    const filtersBar = document.getElementById('filtersBar');
+    const textSizeSel = document.getElementById('textSize');
+    const navHome = document.getElementById('navHome');
+    const navViewer = document.getElementById('navViewer');
+    const navTask = document.getElementById('navTask');
+    const openViewerBtn = document.getElementById('openViewerBtn');
+    const heroTitle = document.getElementById('heroTitle');
+    const themeToggle = document.getElementById('themeToggle');
+    [navHome, navTask, navViewer].forEach(el => {
+        el.addEventListener('click', () => {
+          window.__interacted = true;
+          header.classList.remove('hidden');
+        });
+      });
+    /* ====== THEME ====== */
+    (function initTheme(){
+      const saved = localStorage.getItem('theme') || 'dark';
+      if (saved === 'light') document.documentElement.setAttribute('data-theme','light');
+      themeToggle.textContent = document.documentElement.getAttribute('data-theme')==='light'?'☀️':'🌙';
+      themeToggle.addEventListener('click', ()=>{
+        const l = document.documentElement.getAttribute('data-theme')==='light';
+        document.documentElement.setAttribute('data-theme', l? '' : 'light');
+        localStorage.setItem('theme', l? 'dark':'light');
+        themeToggle.textContent = l? '🌙':'☀️';
+      });
+    })();
 
-    /* ---------- nav active ---------- */
-    function setActiveNav(which){
-      [navHome,navTask,navViewer].forEach(a=>a && a.classList.remove('active'));
-      if (which==='home') navHome.classList.add('active');
-      else if (which==='task') navTask.classList.add('active');
-      else if (which==='viewer') navViewer.classList.add('active');
+    /* ====== NAV / PAGES ====== */
+    function setActiveNav(hash){
+      [navHome, navTask, navViewer].forEach(a=>a.classList.remove('active'));
+      if (hash==='#viewer') navViewer.classList.add('active');
+      else if (hash==='#task') navTask.classList.add('active');
+      else navHome.classList.add('active');
     }
-
-    /* ---------- landing / header visibility ---------- */
-    function goHero2(){ hero1.style.display='none'; hero2.style.display='block'; headerEl.classList.remove('header--hidden'); setActiveNav('home'); }
-    function showViewer(){ landing.style.display='none'; taskSec.style.display='none'; viewer.style.display='block'; headerEl.classList.remove('header--hidden'); setActiveNav('viewer'); qInput.focus(); }
-    function showLanding(){ viewer.style.display='none'; taskSec.style.display='none'; landing.style.display='block'; headerEl.classList.add('header--hidden'); hero2.style.display='none'; hero1.style.display='block'; setActiveNav('home'); }
-    function showTask(){ landing.style.display='none'; viewer.style.display='none'; taskSec.style.display='block'; headerEl.classList.remove('header--hidden'); setActiveNav('task'); }
-
-    if (openBtn) openBtn.addEventListener('click', showViewer);
-    navHome.addEventListener('click', (e)=>{ e.preventDefault(); showLanding(); });
-    navTask.addEventListener('click', (e)=>{ e.preventDefault(); showTask(); });
-    navViewer.addEventListener('click', (e)=>{ e.preventDefault(); showViewer(); });
-
-    // reveal step 2 + header on interaction
-    let revealed=false;
-    function reveal(){ if(revealed) return; revealed=true; goHero2(); }
-    window.addEventListener('wheel', reveal, {passive:true});
-    window.addEventListener('touchmove', reveal, {passive:true});
-    window.addEventListener('keydown', (e)=>{
-      if(['ArrowDown','PageDown',' '].includes(e.key)) reveal();
-      if(e.key==='/'){ showViewer(); qInput.focus(); e.preventDefault(); }
+    function showSection(hash){
+      document.getElementById('landing').classList.toggle('hide', hash!=='#home');
+      document.getElementById('viewer').classList.toggle('hide', hash!=='#viewer');
+      document.getElementById('task').classList.toggle('hide', hash!=='#task');
+      setActiveNav(hash);
+      // header hidden on first landing, shown after any interaction
+      header.classList.toggle('hidden', hash==='#home' && !window.__interacted);
+    }
+    function go(hash){ history.replaceState(null,'',hash); showSection(hash); }
+    window.addEventListener('hashchange', ()=>showSection(location.hash||'#home'));
+    openViewerBtn.addEventListener('click', ()=>{ window.__interacted=true; go('#viewer'); qInput.focus(); });
+    document.addEventListener('wheel', ()=>{
+      if (location.hash==='' || location.hash==='#home'){ window.__interacted=true; header.classList.remove('hidden'); }
     });
-
-    textSizeSel.addEventListener('change', ()=>{ document.querySelectorAll('.ans').forEach(a => a.style.lineHeight = textSizeSel.value); });
-    viewModeSel.addEventListener('change', ()=>{ if (selectedSystems().length) doSearch(); });
-
-    // Filters show/hide
-    filtersBtn.addEventListener('click', ()=>{
-      const open = !filtersBar.classList.contains('open');
-      filtersBar.classList.toggle('open', open);
-      filtersBtn.textContent = open ? '⚙️ Hide Filters' : '⚙️ Filters';
+    document.addEventListener('keydown', (e)=>{
+      if (e.key === '/') { window.__interacted=true; go('#viewer'); qInput.focus(); e.preventDefault(); }
     });
+    heroTitle.addEventListener('click', ()=>{ window.__interacted=true; header.classList.remove('hidden'); });
+    showSection(location.hash || '#home');
 
-    /* ---------- state ---------- */
+    /* ====== DATA ====== */
     let allSystems = [];
     let sysDescriptions = {};
-    let autoCite = false;
-    const AUTO_CITE_PER_ANSWER_LIMIT = 3;
-    const AUTO_CITE_RETMAX = 3;
-
-    /* ---------- systems ---------- */
-    function selectedSystems(){
-      return Array.from(document.querySelectorAll('.chip input[type="checkbox"]:checked')).map(cb => cb.value);
+    async function fetchSystems() {
+      const r = await fetch("/api/systems");
+      const data = await r.json();
+      allSystems = data.systems || [];
+      sysDescriptions = data.descriptions || {};
+      renderSystems();
     }
-    function renderSystems(){
+    function renderSystems() {
       systemsDiv.innerHTML = "";
       allSystems.forEach(sys => {
         const chip = document.createElement("label");
@@ -355,67 +313,47 @@
           <span class="muted" title="${desc}">ⓘ</span>
         `;
         systemsDiv.appendChild(chip);
-        chip.querySelector("input").addEventListener("change", ()=>{ if (selectedSystems().length) doSearch(); else emptyState(); });
       });
     }
-    async function fetchSystems(){
-      const r = await fetch("/api/systems");
-      const data = await r.json();
-      allSystems = data.systems || [];
-      sysDescriptions = data.descriptions || {};
-      renderSystems();
+    function selectedSystems() {
+      return Array.from(document.querySelectorAll('.chip input[type="checkbox"]:checked')).map(cb => cb.value);
     }
 
-    /* ---------- sentence split (fallback) ---------- */
-    function splitSentences(text){
+    /* ====== SEARCH ====== */
+    function splitSentences(text) {
       if (!text) return [];
-      const normalized = String(text)
-        .replace(/\r\n/g, '\n')
-        .replace(/[•●▪■]+/g, '\n')
-        .replace(/\u2022/g, '\n')
-        .replace(/\s+\n/g, '\n')
-        .trim();
-      const lines = normalized.split(/\n+/g);
-      const out = [];
-      for (const line of lines) {
-        const parts = line.trim().split(/(?<=[.!?])\s+(?=[A-Z0-9])/g).map(s=>s.trim()).filter(Boolean);
-        if (parts.length) out.push(...parts);
+      const parts = text.replace(/\s+/g, ' ').split(/(?<=[\.!?])\s+(?=[A-Z0-9])/g);
+      return parts.filter(s => s && s.trim());
+    }
+
+    async function doSearch() {
+      const q = qInput.value.trim();
+      const selected = selectedSystems();
+      if (!q) {
+        resultsDiv.innerHTML = `<div class="muted">Type a query and press <b>Search</b>.</div>`;
+        metaDiv.textContent = '';
+        return;
       }
-      return out;
+      resultsDiv.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="muted">Loading…</div></div>`;
+      const url = `/api/search?q=${encodeURIComponent(q)}&systems=${encodeURIComponent(selected.join(","))}`;
+      const r = await fetch(url);
+      const data = await r.json();
+      renderResults(data);
     }
+    searchBtn.addEventListener('click', doSearch);
+    qInput.addEventListener('keydown', (e)=>{ if (e.key==='Enter') doSearch(); });
 
-    /* ---------- PubMed sentence-hints (optional) ---------- */
-    const RATE_MS = 150; let _citeQ = Promise.resolve(); const _citeCache = new Map();
-    async function fetchCites(sentence, retmax=3){
-      const key = `${sentence}::${retmax}`;
-      if (_citeCache.has(key)) return _citeCache.get(key);
-      _citeQ = _citeQ.then(()=>new Promise(r=>setTimeout(r,RATE_MS)));
-      await _citeQ;
-      const r = await fetch(`/api/cite?sentence=${encodeURIComponent(sentence)}&retmax=${retmax}`);
-      const data = await r.json().catch(()=>({}));
-      _citeCache.set(key, data);
-      return data;
-    }
-    function renderCitations(container, sentence, retmax=3){
-      container.innerHTML = '<span class="muted">searching…</span>';
-      fetchCites(sentence, retmax).then(data=>{
-        if (data.error) { container.innerHTML = `<span class="muted">error: ${data.error}</span>`; return; }
-        if (!data.citations || !data.citations.length) { container.innerHTML = '<span class="muted">no PubMed matches</span>'; return; }
-        const ul = document.createElement('ul'); ul.style.margin='8px 0 0 0'; ul.style.paddingLeft='18px';
-        data.citations.forEach(c=>{
-          const li = document.createElement('li');
-          const a = document.createElement('a'); a.href=c.url; a.target='_blank'; a.rel='noopener';
-          a.textContent = `${c.title} (${c.journal}${c.year?', '+c.year:''})`;
-          li.appendChild(a);
-          if (c.doi){ const d=document.createElement('span'); d.className='muted'; d.style.marginLeft='6px'; d.textContent=`doi:${c.doi}`; li.appendChild(d); }
-          ul.appendChild(li);
-        });
-        container.innerHTML=''; container.appendChild(ul);
-      }).catch(err=>{ container.innerHTML = `<span class="muted">error: ${String(err.message||err)}</span>`; });
-    }
+    toggleFiltersBtn.addEventListener('click', ()=>{
+      const hide = !filtersWrap.classList.contains('hide');
+      filtersWrap.classList.toggle('hide', hide);
+      toggleFiltersBtn.textContent = hide ? 'Show Filters' : 'Hide Filters';
+    });
+    textSizeSel.addEventListener('change', ()=>{
+      document.querySelectorAll('.ans').forEach(a => a.style.lineHeight = textSizeSel.value);
+    });
 
-    /* ---------- PubMed EFetch for cited PMIDs ---------- */
-    async function fetchPMIDsDetails(pmids){
+    /* ====== PMIDs → details (bottom section & per sentence) ====== */
+    async function fetchPMIDsDetails(pmids) {
       const key = pmids.join(",");
       if (!window.__pmidCache) window.__pmidCache = new Map();
       if (window.__pmidCache.has(key)) return window.__pmidCache.get(key);
@@ -424,109 +362,55 @@
       window.__pmidCache.set(key, data);
       return data;
     }
-    function renderPMIDList(container, pmids){
-      container.innerHTML = '<span class="muted">loading citations…</span>';
-      fetchPMIDsDetails(pmids).then(data=>{
-        if (data.error){ container.innerHTML = `<span class="muted">error: ${data.error}</span>`; return; }
-        if (!data.items || !data.items.length){ container.innerHTML = '<span class="muted">no details returned</span>'; return; }
-        const ul=document.createElement('ul'); ul.style.margin='8px 0 0 0'; ul.style.paddingLeft='18px';
-        data.items.forEach(p=>{
-          const li=document.createElement('li');
-          const a=document.createElement('a'); a.href=p.url; a.target='_blank'; a.rel='noopener';
-          a.textContent = `${p.title} (${p.journal}${p.year?', '+p.year:''})`;
+    function renderPMIDList(container, pmids) {
+      container.innerHTML = '<span class="muted">loading…</span>';
+      fetchPMIDsDetails(pmids).then(data => {
+        if (data.error) { container.innerHTML = `<span class="muted">error: ${data.error}</span>`; return; }
+        if (!data.items || !data.items.length) { container.innerHTML = '<span class="muted">no details returned</span>'; return; }
+        const ul = document.createElement('ul'); ul.className='citation-list';
+        data.items.forEach(p => {
+          const li = document.createElement('li'); li.className='citation-card';
+          const a = document.createElement('a'); a.href = p.url; a.target='_blank'; a.rel='noopener';
+          a.textContent = `${p.title} (${p.journal}${p.year ? ', ' + p.year : ''})`;
           li.appendChild(a);
-          if (p.doi){ const d=document.createElement('span'); d.className='muted'; d.style.marginLeft='6px'; d.textContent=`doi:${p.doi}`; li.appendChild(d); }
-          if (p.abstract){
-            const det=document.createElement('details'); det.style.marginTop='6px';
-            const sum=document.createElement('summary'); sum.textContent='Show abstract';
-            const abs=document.createElement('div'); abs.className='muted'; abs.style.marginTop='6px'; abs.style.whiteSpace='pre-wrap'; abs.textContent=p.abstract;
-            det.appendChild(sum); det.appendChild(abs); li.appendChild(det);
+          if (p.doi) {
+            const d = document.createElement('div'); d.className='muted'; d.style.marginTop='4px'; d.textContent = `doi: ${p.doi}`; li.appendChild(d);
+          }
+          if (p.abstract) {
+            const det = document.createElement('details'); 
+            const sum = document.createElement('summary'); sum.textContent = 'Show abstract';
+            const abs = document.createElement('div'); abs.className='absbox'; abs.textContent = p.abstract;
+            det.appendChild(sum); det.appendChild(abs);
+            li.appendChild(det);
           }
           ul.appendChild(li);
         });
-        container.innerHTML=''; container.appendChild(ul);
-      }).catch(err=>{ container.innerHTML = `<span class="muted">error: ${String(err.message||err)}</span>`; });
-    }
-    function addPMIDsSection(card, item, sys){
-      const pmids = (item.pmids && item.pmids[sys]) || [];
-      if (!pmids.length) return;
-      const btn=document.createElement('button'); btn.className='btn'; btn.textContent=`Cited PMIDs (${pmids.length})`;
-      const slot=document.createElement('div'); slot.className='muted'; slot.style.marginTop='8px';
-      btn.addEventListener('click', ()=>renderPMIDList(slot, pmids));
-      card.appendChild(btn); card.appendChild(slot);
+        container.innerHTML = ''; container.appendChild(ul);
+      }).catch(err => { container.innerHTML = `<span class="muted">error: ${String(err.message || err)}</span>`; });
     }
 
-    /* ---------- per-sentence cites (from your runs) ---------- */
-    function addSentenceCitations(rowEl, pmids){
+    function addPMIDsSection(card, pmids) {
       if (!pmids || !pmids.length) return;
-      const bar = document.createElement('div'); bar.className = 'citebar';
-      const label = document.createElement('span'); label.className = 'muted'; label.textContent = 'PMIDs:';
-      bar.appendChild(label);
-      pmids.forEach(id=>{
-        const a=document.createElement('a');
-        a.className='pmidchip'; a.href=`https://pubmed.ncbi.nlm.nih.gov/${id}/`; a.target='_blank'; a.rel='noopener';
-        a.textContent = id;
-        bar.appendChild(a);
-      });
-      const detailsBtn = document.createElement('button'); detailsBtn.className='btn'; detailsBtn.textContent='Show refs';
-      const slot = document.createElement('div'); slot.className='muted'; slot.style.marginTop='6px';
-      detailsBtn.addEventListener('click', ()=> renderPMIDList(slot, pmids));
-      bar.appendChild(detailsBtn);
-      rowEl.appendChild(bar);
-      rowEl.appendChild(slot);
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.textContent = `Cited PMIDs (${pmids.length})`;
+      const slot = document.createElement('div');
+      slot.className = 'muted'; slot.style.marginTop = '8px';
+      btn.addEventListener('click', () => renderPMIDList(slot, pmids));
+      card.appendChild(btn);
+      card.appendChild(slot);
     }
 
-    /* ---------- render answers ---------- */
-    function populateAnswer(ansDiv, text, sentenceObjs){
-      ansDiv.style.lineHeight = textSizeSel.value;
-
-      // Prefer structured sentence objects (Task B runs)
-      if (Array.isArray(sentenceObjs) && sentenceObjs.length){
-        sentenceObjs.forEach((sobj, idx)=>{
-          const row=document.createElement('div'); row.className='srow';
-          const dot=document.createElement('span'); dot.className='bullet';
-          const span=document.createElement('span'); span.className='text'; span.textContent = sobj?.text || '';
-          const actions=document.createElement('span'); actions.className='actions';
-          row.appendChild(dot); row.appendChild(span); row.appendChild(actions);
-          ansDiv.appendChild(row);
-          // Inline PMIDs (chips + optional details)
-          if (Array.isArray(sobj?.citations) && sobj.citations.length){
-            addSentenceCitations(row, sobj.citations);
-          } else if (autoCite && idx < AUTO_CITE_PER_ANSWER_LIMIT){
-            // fall back to hint search when no cites provided
-            const slot=document.createElement('div'); slot.className='muted'; slot.style.marginTop='6px';
-            row.appendChild(slot); renderCitations(slot, sobj?.text || '', AUTO_CITE_RETMAX);
-          }
-        });
-        return;
-      }
-
-      // Fallback: plain text -> sentence splitter
-      if (!text){ ansDiv.innerHTML="<span class='muted'>— no answer —</span>"; return; }
-      const sents = splitSentences(text);
-      sents.forEach((s, idx)=>{
-        const row=document.createElement('div'); row.className='srow';
-        const dot=document.createElement('span'); dot.className='bullet';
-        const span=document.createElement('span'); span.className='text'; span.textContent=s;
-        const actions=document.createElement('span'); actions.className='actions';
-        const btn=document.createElement('button'); btn.className='btn'; btn.textContent='Find PubMed (hint)';
-        const slot=document.createElement('div'); slot.className='muted'; slot.style.marginTop='6px';
-        btn.addEventListener('click', ()=>renderCitations(slot, s, AUTO_CITE_RETMAX));
-        actions.appendChild(btn);
-        row.appendChild(dot); row.appendChild(span); row.appendChild(actions); row.appendChild(slot);
-        ansDiv.appendChild(row);
-        if (autoCite && idx < AUTO_CITE_PER_ANSWER_LIMIT) renderCitations(slot, s, AUTO_CITE_RETMAX);
-      });
-    }
-
-    function renderResults(data){
+    /* ====== RENDER ====== */
+    function renderResults(data) {
       resultsDiv.innerHTML = "";
       metaDiv.textContent = `${data.count} result(s) • showing: ${data.systems.join(", ")}`;
 
-      data.results.forEach(item=>{
-        const wrap=document.createElement("div"); wrap.className="panel result";
+      data.results.forEach(item => {
+        const wrap = document.createElement("div");
+        wrap.className = "panel result";
 
-        const header=document.createElement("div");
+        const header = document.createElement("div");
         header.innerHTML = `
           <div class="qid">ID ${item.id}</div>
           <div class="qt">${item.question}</div>
@@ -534,85 +418,108 @@
         `;
         wrap.appendChild(header);
 
-        const det=document.createElement("details");
-        const sum=document.createElement("summary"); sum.textContent="Show narrative";
-        det.appendChild(sum);
-        const p=document.createElement("div"); p.className="muted"; p.style.marginTop="8px"; p.textContent=item.narrative || "—";
-        det.appendChild(p);
-        wrap.appendChild(det);
+        const det = document.createElement("details");
+        const sum = document.createElement("summary"); sum.textContent = "Show narrative";
+        const p = document.createElement("div"); p.className = "muted"; p.style.marginTop = "8px"; p.textContent = item.narrative || "—";
+        det.appendChild(sum); det.appendChild(p); wrap.appendChild(det);
 
-        const answersWrap=document.createElement("div"); answersWrap.className="answers";
-        const sysList = Object.entries(item.answers).filter(([,text])=>text && text.trim());
+        const answersWrap = document.createElement("div"); answersWrap.className = "answers";
+
+        // systems that have non-empty answers
+        const sysList = Object.entries(item.answers)
+            .filter(([_, obj]) => obj && (obj.text || (obj.sentences && obj.sentences.length)));
         const multi = sysList.length > 1;
-        const mode = viewModeSel.value === 'auto' ? (multi ? 'tabs' : 'single') : viewModeSel.value;
+        const mode = (viewModeSel.value === 'auto') ? (multi ? 'tabs' : 'single') : viewModeSel.value;
 
-        if (!multi || mode === 'single'){
-          const [sys, text] = sysList[0] || Object.entries(item.answers)[0] || ["System",""];
-          const card=document.createElement('div'); card.className='card';
+        function populateCard(cardBody, ansObj, sysName){
+          // Use server-provided sentence alignment if available
+          const sents = ansObj.sentences && ansObj.sentences.length
+            ? ansObj.sentences.map(x => ({t:x.text, pmids:x.pmids||[]}))
+            : splitSentences(ansObj.text).map(t => ({t, pmids:[]})); // fallback
+
+          cardBody.style.lineHeight = textSizeSel.value;
+          sents.forEach(({t, pmids})=>{
+            const row = document.createElement('div'); row.className = 'srow';
+            const dot = document.createElement('span'); dot.className = 'bullet';
+            const span = document.createElement('span'); span.className = 'text'; span.textContent = t;
+            row.appendChild(dot); row.appendChild(span);
+
+            if (pmids && pmids.length){
+              const pm = document.createElement('div'); pm.className='pmids';
+              const label = document.createElement('span'); label.className='muted'; label.textContent = 'PMIDs:';
+              pm.appendChild(label);
+              pmids.slice(0,3).forEach(id=>{
+                const chip = document.createElement('a'); chip.className='pill link'; chip.target="_blank";
+                chip.rel='noopener'; chip.href=`https://pubmed.ncbi.nlm.nih.gov/${id}/`; chip.textContent=id;
+                pm.appendChild(chip);
+              });
+              // “Show refs” button (loads details for exactly these PMIDs)
+              const btn = document.createElement('button'); btn.className='btn'; btn.style.padding='3px 8px'; btn.textContent='Show refs';
+              const slot = document.createElement('div'); slot.className='muted'; slot.style.marginTop='6px';
+              btn.addEventListener('click', ()=> renderPMIDList(slot, pmids));
+              pm.appendChild(btn); row.appendChild(pm); row.appendChild(slot);
+            }
+            cardBody.appendChild(row);
+          });
+
+          // bottom: union PMIDs for the whole answer (if present)
+          if (ansObj.pmids_all && ansObj.pmids_all.length) {
+            addPMIDsSection(cardBody.parentElement, ansObj.pmids_all);
+          } else if (item.pmids && item.pmids[sysName] && item.pmids[sysName].length) {
+            addPMIDsSection(cardBody.parentElement, item.pmids[sysName]);
+          }
+        }
+
+        if (!multi || mode === 'single') {
+          const [sys, ansObj] = sysList[0] || ["System", {text:""}];
+          const card = document.createElement("div"); card.className = "card";
           card.innerHTML = `<div class="sys">${sys}</div><div class="ans"></div>`;
           answersWrap.appendChild(card);
-          const perSent = (item.responses && item.responses[sys]) || [];
-          populateAnswer(card.querySelector('.ans'), text, perSent);
-          addPMIDsSection(card, item, sys);
-        } else if (mode === 'tabs'){
-          const tabs=document.createElement('div'); tabs.className='tabs';
-          const contents=document.createElement('div');
-          sysList.forEach(([sys,text], idx)=>{
-            const t=document.createElement('button'); t.className='tab'+(idx===0?' active':''); t.textContent=sys; tabs.appendChild(t);
-            const c=document.createElement('div'); c.className='tabcontent'+(idx===0?' active':'');
-            const card=document.createElement('div'); card.className='card'; card.innerHTML=`<div class="sys">${sys}</div><div class="ans"></div>`;
+          populateCard(card.querySelector('.ans'), ansObj, sys);
+
+        } else if (mode === 'tabs') {
+          const tabs = document.createElement('div'); tabs.className = 'tabs';
+          const contents = document.createElement('div');
+          sysList.forEach(([sys, ansObj], idx)=>{
+            const t = document.createElement('button'); t.className = 'tab' + (idx===0 ? ' active' : ''); t.textContent = sys;
+            tabs.appendChild(t);
+            const c = document.createElement('div'); c.className = 'tabcontent' + (idx===0 ? ' active' : '');
+            const card = document.createElement('div'); card.className='card';
+            card.innerHTML=`<div class="sys">${sys}</div><div class="ans"></div>`;
             c.appendChild(card); contents.appendChild(c);
-            const perSent = (item.responses && item.responses[sys]) || [];
-            populateAnswer(card.querySelector('.ans'), text, perSent); addPMIDsSection(card, item, sys);
-            t.addEventListener('click', ()=>{ tabs.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); contents.querySelectorAll('.tabcontent').forEach(x=>x.classList.remove('active')); t.classList.add('active'); c.classList.add('active'); });
+            populateCard(card.querySelector('.ans'), ansObj, sys);
+            t.addEventListener('click', ()=>{
+              tabs.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+              contents.querySelectorAll('.tabcontent').forEach(x=>x.classList.remove('active'));
+              t.classList.add('active'); c.classList.add('active');
+            });
           });
           answersWrap.appendChild(tabs); answersWrap.appendChild(contents);
-        } else {
-          const grid=document.createElement('div'); grid.style.display='grid'; grid.style.gridTemplateColumns=`repeat(${Math.min(sysList.length,3)}, minmax(320px,1fr))`; grid.style.gap='16px';
-          sysList.forEach(([sys,text])=>{
-            const card=document.createElement('div'); card.className='card';
-            card.style.boxShadow='0 0 0 1px color-mix(in oklab, var(--border) 80%, transparent) inset';
-            card.style.background='color-mix(in oklab, var(--bg2) 95%, var(--card))';
-            card.innerHTML=`<div class="sys">${sys}</div><div class="ans"></div>`;
+
+        } else { // columns
+          const grid = document.createElement('div');
+          grid.style.display = 'grid';
+          grid.style.gridTemplateColumns = `repeat(${Math.min(sysList.length, 3)}, minmax(320px, 1fr))`;
+          grid.style.gap = '16px';
+          sysList.forEach(([sys, ansObj])=>{
+            const card = document.createElement('div'); card.className = 'card';
+            card.innerHTML = `<div class="sys">${sys}</div><div class="ans"></div>`;
             grid.appendChild(card);
-            const perSent = (item.responses && item.responses[sys]) || [];
-            populateAnswer(card.querySelector('.ans'), text, perSent); addPMIDsSection(card, item, sys);
+            populateCard(card.querySelector('.ans'), ansObj, sys);
           });
           answersWrap.appendChild(grid);
         }
 
-        wrap.appendChild(answersWrap); resultsDiv.appendChild(wrap);
+        wrap.appendChild(answersWrap);
+        resultsDiv.appendChild(wrap);
       });
     }
 
-    /* ---------- search ---------- */
-    function emptyState(){
-      metaDiv.textContent = '0 result(s) • no systems selected';
-      resultsDiv.innerHTML = `<div class="panel"><div class="muted">Select at least one system (System A–E) and click <strong>Search</strong>.</div></div>`;
-    }
-    async function doSearch(){
-      const selected = selectedSystems();
-      const q = qInput.value.trim();
-      if (!selected.length) { emptyState(); return; }
-      resultsDiv.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="muted">Loading answers…</div></div>`;
-      const url = `/api/search?q=${encodeURIComponent(q)}&systems=${encodeURIComponent(selected.join(","))}`;
-      const r = await fetch(url); const data = await r.json();
-      renderResults(data);
-    }
-    document.getElementById('searchBtn').addEventListener('click', doSearch);
-    qInput.addEventListener('keydown', (e)=>{ if (e.key==='Enter') doSearch(); });
-
-    /* ---------- boot ---------- */
+    /* ====== INIT ====== */
     (async function init(){
       await fetchSystems();
-      emptyState();
-
-      const t = document.getElementById('autoCiteToggle');
-      if (t){
-        const saved = localStorage.getItem('autoCite') === 'true';
-        t.checked = saved; autoCite = saved;
-        t.addEventListener('change', ()=>{ autoCite = t.checked; localStorage.setItem('autoCite', String(autoCite)); if (selectedSystems().length) doSearch(); });
-      }
+      // start at Home: header hidden until interaction
+      setActiveNav(location.hash||'#home');
     })();
   </script>
 </body>

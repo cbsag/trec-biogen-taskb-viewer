@@ -26,125 +26,77 @@ function loadTaskB() {
   return byId;
 }
 
-function extractAnswer(obj) {
-  let topicId = null, answerText = "";
-  if (obj && typeof obj === "object") {
-    const md = obj.metadata || {};
-    if (md && md.topic_id != null) {
-      const t = String(md.topic_id).trim(); if (/^\d+$/.test(t)) topicId = Number(t);
-    }
-
-    if (topicId == null && obj.topic_id != null) {
-      const t = String(obj.topic_id).trim(); if (/^\d+$/.test(t)) topicId = Number(t);
-    }
-    if (topicId == null && obj.qid != null) {
-      const t = String(obj.qid).trim(); if (/^\d+$/.test(t)) topicId = Number(t);
-    }
-    if (topicId == null && obj.id != null) {
-      const t = String(obj.id).trim(); if (/^\d+$/.test(t)) topicId = Number(t);
-    }
-    if (Array.isArray(obj.responses) && obj.responses.length) {
-      const parts = [];
-      for (const r of obj.responses) if (r && typeof r.text === "string" && r.text.trim()) parts.push(r.text.trim());
-      answerText = parts.join("\n• ");
-    } else if (typeof obj.answer === "string") answerText = obj.answer;
-    else if (typeof obj.text === "string") answerText = obj.text;
-  }
-  return { topicId, answerText: (answerText || "").trim() };
+function normTopicId(x){
+  if (x == null) return null;
+  const t = String(x).trim();
+  return /^\d+$/.test(t) ? Number(t) : null;
 }
 
-function extractPMIDs(obj) {
-  const set = new Set();
+function unique(arr){ return Array.from(new Set(arr)); }
 
-  const addCite = (c) => {
-    if (typeof c === "string" && /^\d{5,9}$/.test(c.trim())) { set.add(c.trim()); return; }
-    if (c && typeof c === "object") {
-      let s = c.pmid || c.PMID || c.id || "";
-      s = String(s).trim();
-      if (/^\d{5,9}$/.test(s)) set.add(s);
-    }
-  };
-
-  if (Array.isArray(obj.pmids)) obj.pmids.forEach(addCite);
-  if (obj.metadata && Array.isArray(obj.metadata.pmids)) obj.metadata.pmids.forEach(addCite);
-  if (Array.isArray(obj.citations)) obj.citations.forEach(addCite);
-
-  // Task B format
-  if (Array.isArray(obj.responses)) {
-    for (const r of obj.responses) {
-      if (Array.isArray(r?.citations)) r.citations.forEach(addCite);
-    }
-  }
-
-  function scanText(s) {
-    if (!s) return;
-    const re = /PMID[:\s]*([0-9]{5,9})/gi; let m;
-    while ((m = re.exec(s))) set.add(m[1]);
-  }
-  if (typeof obj.answer === "string") scanText(obj.answer);
-  if (typeof obj.text === "string") scanText(obj.text);
-  if (Array.isArray(obj.responses)) for (const r of obj.responses) if (typeof r?.text === "string") scanText(r.text);
-
-  return Array.from(set);
-}
-
-
-function loadSystemResponses(fileName) {
-    const p = path.join(DATA_DIR, fileName);
-    const raw = safeRead(p); const map = {};
-    if (!raw) return map;
-    for (const line of raw.split(/\r?\n/).filter(Boolean)) {
-      let obj=null; try{ obj=JSON.parse(line);}catch{ obj=null; }
-      if (!obj) continue;
-      const { topicId } = extractAnswer(obj);
-      if (topicId == null) continue;
-
-      const out = [];
-      if (Array.isArray(obj.responses)) {
-        for (const r of obj.responses) {
-          if (!r || !r.text) continue;
-          const s = String(r.text).trim();
-          const cites = Array.isArray(r.citations)
-            ? r.citations.filter(x => /^\d{5,9}$/.test(String(x).trim())).map(x => String(x).trim())
-            : [];
-          out.push({ text: s, citations: cites });
-        }
-      }
-      if (out.length) map[topicId] = out;
-    }
-    return map;
-  }
 function loadSystemAnswers(fileName) {
+  // Returns: { [topicId]: { text, sentences:[{text, pmids:[]}, ...], pmids_all:[] } }
   const p = path.join(DATA_DIR, fileName);
-  const raw = safeRead(p); const answers = {};
-  if (!raw) return answers;
+  const raw = safeRead(p);
+  const out = {};
+  if (!raw) return out;
+
   for (const line of raw.split(/\r?\n/).filter(Boolean)) {
     let obj = null; try { obj = JSON.parse(line); } catch { obj = null; }
     if (!obj) continue;
-    const { topicId, answerText } = extractAnswer(obj);
-    if (topicId == null || !answerText) continue;
-    answers[topicId] = answers[topicId] ? (answers[topicId] + "\n• " + answerText) : answerText;
+
+    // topic id
+    const topicId = normTopicId(obj?.metadata?.topic_id ?? obj?.id);
+    if (topicId == null) continue;
+
+    // build text & sentence list
+    let sentences = [];
+    let fullText = "";
+
+    if (Array.isArray(obj.responses) && obj.responses.length) {
+      sentences = obj.responses.map(r => ({
+        text: (r?.text || "").trim(),
+        pmids: Array.isArray(r?.citations)
+          ? r.citations.map(x => String(x).trim()).filter(s => /^\d{5,9}$/.test(s)).slice(0,3)
+          : []
+      })).filter(s => s.text);
+
+      fullText = sentences.map(s => s.text).join(" ");
+
+    } else if (typeof obj.answer === "string") {
+      fullText = obj.answer.trim();
+      sentences = fullText.split(/(?<=[.!?])\s+(?=[A-Z0-9])/g).map(t => ({ text: t, pmids: [] }));
+    } else if (typeof obj.text === "string") {
+      fullText = obj.text.trim();
+      sentences = fullText.split(/(?<=[.!?])\s+(?=[A-Z0-9])/g).map(t => ({ text: t, pmids: [] }));
+    }
+
+    const pmids_all = unique(sentences.flatMap(s => s.pmids)).slice(0,50);
+
+    out[topicId] = { text: fullText, sentences, pmids_all };
   }
-  return answers;
+  return out;
 }
 
 function loadSystemPMIDs(fileName) {
+  // Kept for backwards compatibility (union per topic)
   const p = path.join(DATA_DIR, fileName);
   const raw = safeRead(p); const idsByTopic = {};
   if (!raw) return idsByTopic;
   for (const line of raw.split(/\r?\n/).filter(Boolean)) {
     let obj = null; try { obj = JSON.parse(line); } catch { obj = null; }
     if (!obj) continue;
-    const { topicId } = extractAnswer(obj);
+    const topicId = normTopicId(obj?.metadata?.topic_id ?? obj?.id);
     if (topicId == null) continue;
-    const ids = extractPMIDs(obj);
-    if (!ids.length) continue;
+
+    const inResponses = Array.isArray(obj.responses) ? obj.responses.flatMap(r => Array.isArray(r?.citations)? r.citations : []) : [];
+    const arr = inResponses.map(x => String(x).trim()).filter(s => /^\d{5,9}$/.test(s));
+    if (!arr.length) continue;
     if (!idsByTopic[topicId]) idsByTopic[topicId] = [];
-    idsByTopic[topicId].push(...ids);
+    idsByTopic[topicId].push(...arr);
   }
-  // unique + normalized
   for (const k of Object.keys(idsByTopic)) {
-    idsByTopic[k] = Array.from(new Set(idsByTopic[k].map(x => String(x).trim()))).slice(0, 50);
+    idsByTopic[k] = Array.from(new Set(idsByTopic[k])).slice(0,50);
   }
   return idsByTopic;
 }
@@ -153,11 +105,9 @@ function loadSystemPMIDs(fileName) {
 const TASK_ITEMS = loadTaskB();
 const SYSTEM_ANSWERS = Object.fromEntries(Object.entries(SYSTEMS).map(([name,file]) => [name, loadSystemAnswers(file)]));
 const SYSTEM_PMIDS   = Object.fromEntries(Object.entries(SYSTEMS).map(([name,file]) => [name, loadSystemPMIDs(file)]));
-const SYSTEM_RESPONSES = Object.fromEntries(Object.entries(SYSTEMS).map(([name,file]) => [name, loadSystemResponses(file)]));
-
 
 function searchItems(query) {
-  if (!query || !String(query).trim()) return Object.values(TASK_ITEMS).sort((a,b)=>(a.id||0)-(b.id||0));
+  if (!query || !String(query).trim()) return [];
   const q = String(query).toLowerCase().trim(); const toks = q.split(/\s+/g);
   const res = [];
   for (const item of Object.values(TASK_ITEMS)) {
@@ -170,7 +120,7 @@ function searchItems(query) {
 function loadDescriptions() {
   const defaultDesc = {
     "System A": "Baseline + Qwen (placeholder).",
-    "System B": "Placeholder.",
+    "System B": "TF-IDF / BM25 pipeline (placeholder).",
     "System C": "BM25 + reformulations; MedCPT bi-encoder + cross-encoder rerank.",
     "System D": "BM25 original; keep top-30 after rerank; MedCPT bi+cross encoder.",
     "System E": "Placeholder.",
@@ -180,8 +130,4 @@ function loadDescriptions() {
   try { const obj = JSON.parse(raw); return { ...defaultDesc, ...obj }; } catch { return defaultDesc; }
 }
 
-// module.exports = { SYSTEMS, SYSTEM_ANSWERS, SYSTEM_PMIDS, TASK_ITEMS, searchItems, loadDescriptions };
-module.exports = {
-  SYSTEMS, SYSTEM_ANSWERS, SYSTEM_PMIDS, SYSTEM_RESPONSES,
-  TASK_ITEMS, searchItems, loadDescriptions
-};
+module.exports = { SYSTEMS, SYSTEM_ANSWERS, SYSTEM_PMIDS, TASK_ITEMS, searchItems, loadDescriptions };
