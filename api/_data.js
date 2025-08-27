@@ -56,13 +56,28 @@ function extractAnswer(obj) {
 function extractPMIDs(obj) {
   const set = new Set();
 
-  // Common shapes
-  if (Array.isArray(obj.pmids)) obj.pmids.forEach(x => { const s = String(x).trim(); if (/^\d{5,9}$/.test(s)) set.add(s); });
-  if (obj.metadata && Array.isArray(obj.metadata.pmids)) obj.metadata.pmids.forEach(x => { const s = String(x).trim(); if (/^\d{5,9}$/.test(s)) set.add(s); });
-  if (Array.isArray(obj.citations)) obj.citations.forEach(c => { const s = String(c?.pmid || c?.PMID || "").trim(); if (/^\d{5,9}$/.test(s)) set.add(s); });
-  if (Array.isArray(obj.references)) obj.references.forEach(x => { const s = String(x?.pmid || x).trim(); if (/^\d{5,9}$/.test(s)) set.add(s); });
-  if (Array.isArray(obj.evidence)) obj.evidence.forEach(x => { const s = String(x?.pmid || x?.PMID || "").trim(); if (/^\d{5,9}$/.test(s)) set.add(s); });
-  // Pull from text if present: “PMID: 12345678”
+  const addCite = (c) => {
+    if (typeof c === "string" && /^\d{5,9}$/.test(c.trim())) { set.add(c.trim()); return; }
+    if (c && typeof c === "object") {
+      let s = c.pmid || c.PMID || c.id || "";
+      s = String(s).trim();
+      if (/^\d{5,9}$/.test(s)) set.add(s);
+    }
+  };
+
+  // common spots
+  if (Array.isArray(obj.pmids)) obj.pmids.forEach(addCite);
+  if (obj.metadata && Array.isArray(obj.metadata.pmids)) obj.metadata.pmids.forEach(addCite);
+  if (Array.isArray(obj.citations)) obj.citations.forEach(addCite);
+
+  // inside responses (Task B format)
+  if (Array.isArray(obj.responses)) {
+    for (const r of obj.responses) {
+      if (Array.isArray(r?.citations)) r.citations.forEach(addCite);
+    }
+  }
+
+  // fallback: scan text for "PMID: 12345678"
   function scanText(s) {
     if (!s) return;
     const re = /PMID[:\s]*([0-9]{5,9})/gi; let m;
@@ -70,7 +85,7 @@ function extractPMIDs(obj) {
   }
   if (typeof obj.answer === "string") scanText(obj.answer);
   if (typeof obj.text === "string") scanText(obj.text);
-  if (Array.isArray(obj.responses)) for (const r of obj.responses) if (r && typeof r.text === "string") scanText(r.text);
+  if (Array.isArray(obj.responses)) for (const r of obj.responses) if (typeof r?.text === "string") scanText(r.text);
 
   return Array.from(set);
 }
