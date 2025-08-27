@@ -65,19 +65,17 @@ function extractPMIDs(obj) {
     }
   };
 
-  // common spots
   if (Array.isArray(obj.pmids)) obj.pmids.forEach(addCite);
   if (obj.metadata && Array.isArray(obj.metadata.pmids)) obj.metadata.pmids.forEach(addCite);
   if (Array.isArray(obj.citations)) obj.citations.forEach(addCite);
 
-  // inside responses (Task B format)
+  // Task B format
   if (Array.isArray(obj.responses)) {
     for (const r of obj.responses) {
       if (Array.isArray(r?.citations)) r.citations.forEach(addCite);
     }
   }
 
-  // fallback: scan text for "PMID: 12345678"
   function scanText(s) {
     if (!s) return;
     const re = /PMID[:\s]*([0-9]{5,9})/gi; let m;
@@ -90,6 +88,32 @@ function extractPMIDs(obj) {
   return Array.from(set);
 }
 
+
+function loadSystemResponses(fileName) {
+    const p = path.join(DATA_DIR, fileName);
+    const raw = safeRead(p); const map = {};
+    if (!raw) return map;
+    for (const line of raw.split(/\r?\n/).filter(Boolean)) {
+      let obj=null; try{ obj=JSON.parse(line);}catch{ obj=null; }
+      if (!obj) continue;
+      const { topicId } = extractAnswer(obj);
+      if (topicId == null) continue;
+
+      const out = [];
+      if (Array.isArray(obj.responses)) {
+        for (const r of obj.responses) {
+          if (!r || !r.text) continue;
+          const s = String(r.text).trim();
+          const cites = Array.isArray(r.citations)
+            ? r.citations.filter(x => /^\d{5,9}$/.test(String(x).trim())).map(x => String(x).trim())
+            : [];
+          out.push({ text: s, citations: cites });
+        }
+      }
+      if (out.length) map[topicId] = out;
+    }
+    return map;
+  }
 function loadSystemAnswers(fileName) {
   const p = path.join(DATA_DIR, fileName);
   const raw = safeRead(p); const answers = {};
@@ -129,6 +153,8 @@ function loadSystemPMIDs(fileName) {
 const TASK_ITEMS = loadTaskB();
 const SYSTEM_ANSWERS = Object.fromEntries(Object.entries(SYSTEMS).map(([name,file]) => [name, loadSystemAnswers(file)]));
 const SYSTEM_PMIDS   = Object.fromEntries(Object.entries(SYSTEMS).map(([name,file]) => [name, loadSystemPMIDs(file)]));
+const SYSTEM_RESPONSES = Object.fromEntries(Object.entries(SYSTEMS).map(([name,file]) => [name, loadSystemResponses(file)]));
+
 
 function searchItems(query) {
   if (!query || !String(query).trim()) return Object.values(TASK_ITEMS).sort((a,b)=>(a.id||0)-(b.id||0));
@@ -154,4 +180,8 @@ function loadDescriptions() {
   try { const obj = JSON.parse(raw); return { ...defaultDesc, ...obj }; } catch { return defaultDesc; }
 }
 
-module.exports = { SYSTEMS, SYSTEM_ANSWERS, SYSTEM_PMIDS, TASK_ITEMS, searchItems, loadDescriptions };
+// module.exports = { SYSTEMS, SYSTEM_ANSWERS, SYSTEM_PMIDS, TASK_ITEMS, searchItems, loadDescriptions };
+module.exports = {
+  SYSTEMS, SYSTEM_ANSWERS, SYSTEM_PMIDS, SYSTEM_RESPONSES,
+  TASK_ITEMS, searchItems, loadDescriptions
+};

@@ -20,8 +20,20 @@
     body{ margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
       color:var(--text); background:var(--bg); }
 
+    /* --- global animated background --- */
+    #anim, #bgLines{ position:fixed; inset:0; pointer-events:none; z-index:0 }
+    #anim{
+      background:
+        radial-gradient(40% 60% at 20% 10%, #1b1f46 0%, transparent 60%),
+        radial-gradient(40% 50% at 80% 0%, #2a2160 0%, transparent 60%),
+        radial-gradient(30% 60% at 60% 90%, #151b44 0%, transparent 60%),
+        radial-gradient(20% 30% at 10% 80%, #2c114b 0%, transparent 60%);
+      filter:blur(30px);animation:float 16s ease-in-out infinite alternate; opacity:.7
+    }
+    @keyframes float{to{transform:translateY(-18px) scale(1.02)}}
+
     header{
-      position:sticky;top:0;z-index:10;padding:12px 24px;border-bottom:1px solid var(--border);
+      position:sticky;top:0;z-index:5;padding:12px 24px;border-bottom:1px solid var(--border);
       background:color-mix(in oklab, var(--bg) 85%, transparent); backdrop-filter:blur(6px);
       transition:transform .35s ease, opacity .35s ease;
     }
@@ -34,19 +46,10 @@
     .themeBtn{ margin-left:6px;border-radius:999px;border:1px solid var(--border-2); background:var(--bg2); color:var(--text);
       padding:6px 10px; cursor:pointer; font-size:13px; }
 
-    .container{max-width:1100px;margin:0 auto;padding:16px 24px 24px}
+    .container{max-width:1100px;margin:0 auto;padding:16px 24px 24px; position:relative; z-index:1}
 
-    #landing{ position:relative;height:72vh;display:flex;align-items:center;justify-content:center;overflow:hidden }
-    #anim{
-      position:absolute;inset:0;background:
-        radial-gradient(40% 60% at 20% 10%, #1b1f46 0%, transparent 60%),
-        radial-gradient(40% 50% at 80% 0%, #2a2160 0%, transparent 60%),
-        radial-gradient(30% 60% at 60% 90%, #151b44 0%, transparent 60%),
-        radial-gradient(20% 30% at 10% 80%, #2c114b 0%, transparent 60%);
-      filter:blur(30px);animation:float 16s ease-in-out infinite alternate
-    }
-    @keyframes float{to{transform:translateY(-18px) scale(1.02)}}
-    #bgLines{ position:absolute; inset:0; z-index:0; opacity:.5; }
+    /* landing */
+    #landing{ position:relative; height:72vh; display:flex; align-items:center; justify-content:center; }
     .hero{position:relative;text-align:center;z-index:1}
     .hero h2{font-size:46px;margin:0 0 10px}
     .hero p{color:var(--muted);margin:0 0 18px}
@@ -58,6 +61,7 @@
     .hero .cta:hover{box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent)}
     .scroll-tip{ position:absolute; bottom:28px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12px }
 
+    /* cards & content */
     .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px}
     .row{display:flex;gap:12px;flex-wrap:wrap}
     .grow{flex:1}
@@ -75,6 +79,7 @@
     .qt{font-size:18px;font-weight:800;margin:6px 0 4px}
     .topic{font-size:13px;color:var(--muted)}
 
+    /* narrative summary style (legible in light & dark) */
     details{margin-top:8px}
     details summary{
       display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px;
@@ -92,6 +97,7 @@
     .srow .bullet{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px;transform:translateY(-1px)}
     .srow .text{display:inline}
     .srow .actions{display:inline-flex;gap:8px;margin-left:8px}
+
     .btn{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--border-2);background:var(--bg2);color:var(--text);cursor:pointer}
     .btn:hover{background:var(--accent-weak);border-color:var(--accent); color:#fff}
     body.light .btn:hover{ color:#fff }
@@ -114,13 +120,23 @@
     .filtersBar.open{ display:block }
     .filtersToggle{ margin-left:auto }
 
+    /* per-sentence PMIDs */
+    .citebar{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:6px }
+    .pmidchip{ display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--border-2);
+      background:var(--bg2); color:var(--text); text-decoration:none }
+    .pmidchip:hover{ border-color:var(--accent) }
+
     .footer{ text-align:center;color:var(--muted);padding:26px 24px;font-size:13px;border-top:1px solid var(--border) }
     .footer a{ color:color-mix(in oklab, var(--accent) 70%, #cdb8ff); text-decoration:none }
     .footer a:hover{text-decoration:underline}
   </style>
 </head>
 <body>
-  <!-- header is hidden until user interacts -->
+  <!-- global animated bg -->
+  <div id="anim"></div>
+  <canvas id="bgLines"></canvas>
+
+  <!-- header (hidden until interact) -->
   <header id="topHeader" class="header--hidden">
     <div class="container">
       <div class="nav">
@@ -135,19 +151,13 @@
     </div>
   </header>
 
-  <!-- landing (no Next button; scroll/swipe/keys reveal step 2 + header) -->
-  <section id="landing">
-    <div id="anim"></div>
-    <canvas id="bgLines"></canvas>
-
-    <!-- step 1 -->
+  <!-- landing -->
+  <section id="landing" class="container">
     <div class="hero" id="hero1">
       <h2>TREC BioGen 2025 — Task B</h2>
       <p>Generate answers for 30 medical questions and compare systems.</p>
       <div class="scroll-tip">scroll / swipe to continue</div>
     </div>
-
-    <!-- step 2 -->
     <div class="hero" id="hero2" style="display:none">
       <h2>Biomedical QA, grounded &amp; comparable</h2>
       <p>Compare system answers sentence-by-sentence with PubMed citations.</p>
@@ -242,7 +252,7 @@
       const cvs = document.getElementById('bgLines'); if(!cvs) return;
       const ctx = cvs.getContext('2d',{alpha:true});
       let w=0,h=0, t=0, raf;
-      function size(){ const r = window.devicePixelRatio||1; w=cvs.clientWidth; h=cvs.clientHeight; cvs.width=w*r; cvs.height=h*r; ctx.setTransform(r,0,0,r,0,0); }
+      function size(){ const r = window.devicePixelRatio||1; w=window.innerWidth; h=window.innerHeight; cvs.width=w*r; cvs.height=h*r; ctx.setTransform(r,0,0,r,0,0); }
       function draw(){
         ctx.clearRect(0,0,w,h);
         const cols = 8, spacing = w/(cols+1);
@@ -257,7 +267,7 @@
         }
         t = performance.now(); raf = requestAnimationFrame(draw);
       }
-      const ro = new ResizeObserver(size); ro.observe(cvs); size(); draw();
+      window.addEventListener('resize', size); size(); draw();
       window.addEventListener('visibilitychange', ()=>{ if(document.hidden){ cancelAnimationFrame(raf); } else { t=performance.now(); draw(); }});
     })();
 
@@ -294,10 +304,10 @@
     /* ---------- landing / header visibility ---------- */
     function goHero2(){ hero1.style.display='none'; hero2.style.display='block'; headerEl.classList.remove('header--hidden'); setActiveNav('home'); }
     function showViewer(){ landing.style.display='none'; taskSec.style.display='none'; viewer.style.display='block'; headerEl.classList.remove('header--hidden'); setActiveNav('viewer'); qInput.focus(); }
-    function showLanding(){ viewer.style.display='none'; taskSec.style.display='none'; landing.style.display='flex'; headerEl.classList.add('header--hidden'); hero2.style.display='none'; hero1.style.display='block'; setActiveNav('home'); }
+    function showLanding(){ viewer.style.display='none'; taskSec.style.display='none'; landing.style.display='block'; headerEl.classList.add('header--hidden'); hero2.style.display='none'; hero1.style.display='block'; setActiveNav('home'); }
     function showTask(){ landing.style.display='none'; viewer.style.display='none'; taskSec.style.display='block'; headerEl.classList.remove('header--hidden'); setActiveNav('task'); }
 
-    openBtn.addEventListener('click', showViewer);
+    if (openBtn) openBtn.addEventListener('click', showViewer);
     navHome.addEventListener('click', (e)=>{ e.preventDefault(); showLanding(); });
     navTask.addEventListener('click', (e)=>{ e.preventDefault(); showTask(); });
     navViewer.addEventListener('click', (e)=>{ e.preventDefault(); showViewer(); });
@@ -345,7 +355,7 @@
           <span class="muted" title="${desc}">ⓘ</span>
         `;
         systemsDiv.appendChild(chip);
-        chip.querySelector("input").addEventListener("change", ()=>{ /* keep meta in sync */ if (selectedSystems().length) doSearch(); else emptyState(); });
+        chip.querySelector("input").addEventListener("change", ()=>{ if (selectedSystems().length) doSearch(); else emptyState(); });
       });
     }
     async function fetchSystems(){
@@ -356,12 +366,12 @@
       renderSystems();
     }
 
-    /* ---------- sentence split ---------- */
+    /* ---------- sentence split (fallback) ---------- */
     function splitSentences(text){
       if (!text) return [];
       const normalized = String(text)
         .replace(/\r\n/g, '\n')
-        .replace(/[•●▪■]+/g, '\n')   // bullets -> new lines
+        .replace(/[•●▪■]+/g, '\n')
         .replace(/\u2022/g, '\n')
         .replace(/\s+\n/g, '\n')
         .trim();
@@ -374,7 +384,7 @@
       return out;
     }
 
-    /* ---------- PubMed sentence hints ---------- */
+    /* ---------- PubMed sentence-hints (optional) ---------- */
     const RATE_MS = 150; let _citeQ = Promise.resolve(); const _citeCache = new Map();
     async function fetchCites(sentence, retmax=3){
       const key = `${sentence}::${retmax}`;
@@ -446,9 +456,52 @@
       card.appendChild(btn); card.appendChild(slot);
     }
 
+    /* ---------- per-sentence cites (from your runs) ---------- */
+    function addSentenceCitations(rowEl, pmids){
+      if (!pmids || !pmids.length) return;
+      const bar = document.createElement('div'); bar.className = 'citebar';
+      const label = document.createElement('span'); label.className = 'muted'; label.textContent = 'PMIDs:';
+      bar.appendChild(label);
+      pmids.forEach(id=>{
+        const a=document.createElement('a');
+        a.className='pmidchip'; a.href=`https://pubmed.ncbi.nlm.nih.gov/${id}/`; a.target='_blank'; a.rel='noopener';
+        a.textContent = id;
+        bar.appendChild(a);
+      });
+      const detailsBtn = document.createElement('button'); detailsBtn.className='btn'; detailsBtn.textContent='Show refs';
+      const slot = document.createElement('div'); slot.className='muted'; slot.style.marginTop='6px';
+      detailsBtn.addEventListener('click', ()=> renderPMIDList(slot, pmids));
+      bar.appendChild(detailsBtn);
+      rowEl.appendChild(bar);
+      rowEl.appendChild(slot);
+    }
+
     /* ---------- render answers ---------- */
-    function populateSentences(ansDiv, text){
+    function populateAnswer(ansDiv, text, sentenceObjs){
       ansDiv.style.lineHeight = textSizeSel.value;
+
+      // Prefer structured sentence objects (Task B runs)
+      if (Array.isArray(sentenceObjs) && sentenceObjs.length){
+        sentenceObjs.forEach((sobj, idx)=>{
+          const row=document.createElement('div'); row.className='srow';
+          const dot=document.createElement('span'); dot.className='bullet';
+          const span=document.createElement('span'); span.className='text'; span.textContent = sobj?.text || '';
+          const actions=document.createElement('span'); actions.className='actions';
+          row.appendChild(dot); row.appendChild(span); row.appendChild(actions);
+          ansDiv.appendChild(row);
+          // Inline PMIDs (chips + optional details)
+          if (Array.isArray(sobj?.citations) && sobj.citations.length){
+            addSentenceCitations(row, sobj.citations);
+          } else if (autoCite && idx < AUTO_CITE_PER_ANSWER_LIMIT){
+            // fall back to hint search when no cites provided
+            const slot=document.createElement('div'); slot.className='muted'; slot.style.marginTop='6px';
+            row.appendChild(slot); renderCitations(slot, sobj?.text || '', AUTO_CITE_RETMAX);
+          }
+        });
+        return;
+      }
+
+      // Fallback: plain text -> sentence splitter
       if (!text){ ansDiv.innerHTML="<span class='muted'>— no answer —</span>"; return; }
       const sents = splitSentences(text);
       sents.forEach((s, idx)=>{
@@ -456,7 +509,7 @@
         const dot=document.createElement('span'); dot.className='bullet';
         const span=document.createElement('span'); span.className='text'; span.textContent=s;
         const actions=document.createElement('span'); actions.className='actions';
-        const btn=document.createElement('button'); btn.className='btn'; btn.textContent='Find PubMed cites';
+        const btn=document.createElement('button'); btn.className='btn'; btn.textContent='Find PubMed (hint)';
         const slot=document.createElement('div'); slot.className='muted'; slot.style.marginTop='6px';
         btn.addEventListener('click', ()=>renderCitations(slot, s, AUTO_CITE_RETMAX));
         actions.appendChild(btn);
@@ -498,7 +551,9 @@
           const card=document.createElement('div'); card.className='card';
           card.innerHTML = `<div class="sys">${sys}</div><div class="ans"></div>`;
           answersWrap.appendChild(card);
-          populateSentences(card.querySelector('.ans'), text); addPMIDsSection(card, item, sys);
+          const perSent = (item.responses && item.responses[sys]) || [];
+          populateAnswer(card.querySelector('.ans'), text, perSent);
+          addPMIDsSection(card, item, sys);
         } else if (mode === 'tabs'){
           const tabs=document.createElement('div'); tabs.className='tabs';
           const contents=document.createElement('div');
@@ -507,7 +562,8 @@
             const c=document.createElement('div'); c.className='tabcontent'+(idx===0?' active':'');
             const card=document.createElement('div'); card.className='card'; card.innerHTML=`<div class="sys">${sys}</div><div class="ans"></div>`;
             c.appendChild(card); contents.appendChild(c);
-            populateSentences(card.querySelector('.ans'), text); addPMIDsSection(card, item, sys);
+            const perSent = (item.responses && item.responses[sys]) || [];
+            populateAnswer(card.querySelector('.ans'), text, perSent); addPMIDsSection(card, item, sys);
             t.addEventListener('click', ()=>{ tabs.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); contents.querySelectorAll('.tabcontent').forEach(x=>x.classList.remove('active')); t.classList.add('active'); c.classList.add('active'); });
           });
           answersWrap.appendChild(tabs); answersWrap.appendChild(contents);
@@ -518,7 +574,9 @@
             card.style.boxShadow='0 0 0 1px color-mix(in oklab, var(--border) 80%, transparent) inset';
             card.style.background='color-mix(in oklab, var(--bg2) 95%, var(--card))';
             card.innerHTML=`<div class="sys">${sys}</div><div class="ans"></div>`;
-            grid.appendChild(card); populateSentences(card.querySelector('.ans'), text); addPMIDsSection(card, item, sys);
+            grid.appendChild(card);
+            const perSent = (item.responses && item.responses[sys]) || [];
+            populateAnswer(card.querySelector('.ans'), text, perSent); addPMIDsSection(card, item, sys);
           });
           answersWrap.appendChild(grid);
         }
@@ -541,7 +599,6 @@
       const r = await fetch(url); const data = await r.json();
       renderResults(data);
     }
-    // Only search on Enter or button click
     document.getElementById('searchBtn').addEventListener('click', doSearch);
     qInput.addEventListener('keydown', (e)=>{ if (e.key==='Enter') doSearch(); });
 
