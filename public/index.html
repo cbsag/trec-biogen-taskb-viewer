@@ -32,13 +32,26 @@
     .ans { white-space: pre-wrap; line-height: 1.35; }
     .footer { text-align: center; color: var(--muted); padding: 24px; font-size: 13px; }
     .badge { display:inline-block; background: #10204a; border: 1px solid #1e3a8a; color: #c7d2fe; padding: 2px 8px; font-size: 11px; border-radius: 999px; }
+    .spinner-wrap { display:flex; gap:10px; align-items:center; justify-content:center; padding:24px; }
+    .spinner { width:16px; height:16px; border-radius:50%; border:3px solid #263154; border-top-color:#6ea8fe; animation:spin 0.9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .panel { padding: 20px; }
+    .answers { gap: 16px; }
+    .card { padding: 14px; line-height: 1.5; }
+    .ans div { margin-bottom: 10px; }
   </style>
 </head>
 <body>
   <header>
     <div class="container">
       <h1>TREC BioGen 2025 — Task B Viewer</h1>
-      <div class="muted">Search the 30 questions and compare answers across your systems.</div>
+      <div class="muted">Search the 30 questions and compare answers across different systems.</div>
+    </div>
+    <div class="muted" style="margin-top:6px">
+      Built by <strong>Ganesh Chandrasekar</strong> ·
+      <a href="https://github.com/cbsag" target="_blank" rel="noopener" style="color:#c7d2fe">GitHub</a>
+      ·
+      <a href="https://www.linkedin.com/in/your-link" target="_blank" rel="noopener" style="color:#c7d2fe">LinkedIn</a>
     </div>
   </header>
 
@@ -62,7 +75,11 @@
     <div id="results"></div>
   </div>
 
-  <div class="footer">Deploy on Vercel. Edit system descriptions in <span class="badge">/data/system_descriptions.json</span>.</div>
+  <div class="footer">
+  cbsag
+  <a href="https://github.com/cbsag" target="_blank" rel="noopener" style="color:#c7d2fe">GitHub</a> ·
+  <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener" style="color:#c7d2fe">LinkedIn</a>
+</div>
 
   <script>
     const systemsDiv = document.getElementById("systems");
@@ -242,6 +259,7 @@
     async function doSearch() {
       const q = qInput.value;
       const selected = selectedSystems();
+      resultsDiv.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="muted">Loading answers…</div></div>`;
       const url = `/api/search?q=${encodeURIComponent(q)}&systems=${encodeURIComponent(selected.join(","))}`;
       const r = await fetch(url);
       const data = await r.json();

@@ -38,15 +38,13 @@ async function esearch(term, retmax=5) {
   const params = new URLSearchParams({
     db: "pubmed",
     retmode: "json",
-    sort: "relevance",
-    retmax: String(retmax),
-    term
+    // add the rest (term/retmax for esearch; id for esummary)
   });
+  // include API key
   if (API_KEY) params.set("api_key", API_KEY);
-  const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?${params.toString()}`;
-  const r = await fetch(url, {
-    headers: CONTACT_EMAIL ? { "User-Agent": `Email ${CONTACT_EMAIL}` } : {}
-  });
+  // include email + tool for etiquette/compliance
+  if (CONTACT_EMAIL) params.set("email", CONTACT_EMAIL);
+  params.set("tool", process.env.TOOL_NAME || "trec-biogen-viewer");
   if (!r.ok) throw new Error(`esearch failed: ${r.status}`);
   const j = await r.json();
   const ids = j?.esearchresult?.idlist || [];
@@ -62,9 +60,8 @@ async function esummary(ids) {
   });
   if (API_KEY) params.set("api_key", API_KEY);
   const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?${params.toString()}`;
-  const r = await fetch(url, {
-    headers: CONTACT_EMAIL ? { "User-Agent": `Email ${CONTACT_EMAIL}` } : {}
-  });
+  const ua = CONTACT_EMAIL ? { "User-Agent": `mailto:${CONTACT_EMAIL}` } : {};
+  const r = await fetch(url, { headers: ua });
   if (!r.ok) throw new Error(`esummary failed: ${r.status}`);
   const j = await r.json();
   return j?.result || {};
