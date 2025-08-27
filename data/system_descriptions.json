@@ -1,0 +1,7 @@
+{
+  "System A": "Baseline + Qwen (placeholder): BM25 on PubMed with the original query; concatenate top-k abstracts; Qwen generates the final answer. No cross-encoder reranking.",
+  "System B": "Placeholder: BM25 + simple rerank (specify the reranker and top-k kept) + your generation model. Note any guardrails or post-processing.",
+  "System C": "BM25 on PubMed with Original + 3 reformulations; MedCPT Bi-Encoder (L2-norm) \u2192 Cross-Encoder reranks top-20; truncated docs appended to QA context.",
+  "System D": "BM25 on PubMed (original query). From 200 retrieved, keep top-30 after rerank; MedCPT Bi-Encoder + Cross-Encoder reranks top-20; final QA context from selected docs.",
+  "System E": "Placeholder: describe what\u2019s unique (e.g., different retriever, more context, alternative LLM, constrained decoding)."
+}

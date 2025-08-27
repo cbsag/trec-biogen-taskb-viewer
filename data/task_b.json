@@ -1,0 +1,272 @@
+[
+  {
+    "id": 181,
+    "question": "what is axonal injury on my mri brain report; is it a concern?",
+    "narrative": "During an ED visit after a car accident, the patient was told an axonal injury was detected. The patient is concerned it will affect his health.",
+    "topic": "axonal injury on brain mri",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 182,
+    "question": "what tests might be done to verify I have a uti?",
+    "narrative": "A patient with discomfort during urination and flank pain is on treatment for uti for three days, but doesn't feel better the patient is asking the doctor which tests can definitely confirm a uti infection.",
+    "topic": "uti diagnostic tests",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 183,
+    "question": "what if i take a gabapentin by accident?",
+    "narrative": "A 45-year old woman has accidentally taken a gabapentin pill out of her spouse's pillbox instead of taking a similar looking metformin pill out of her own. She is feeling fatigued and weak. She is worried this is caused by gabapentin and wants to know if she needs to go to ER.",
+    "topic": "accidental gabapentin ingestion",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 184,
+    "question": "if you have sepsis and have no problem breathing or stomach problems and the only thing is extreme thirst does this require hospitalization?",
+    "narrative": "The patient's provider suspects the patient has sepsis and recommends hospitalization for diagnosis confirmation and treatment. The patient has urgent deadlines and wants to know if hospitalization is absolutely necessary. Other than extreme thirst, the patient feels fine and has no problems breathing or stomach problems.",
+    "topic": "hospitalizations for sepsis",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 185,
+    "question": "what are the treatment options for a burn patient after a kitchen grease fire?",
+    "narrative": "A teenager's arm and foot were splashed with very hot kitchen grease. After first aid for burns, the parents are looking for the best treatments to reduce pain and prevent infection and scars.",
+    "topic": "treatment for grease burn",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 186,
+    "question": "how bad is an av malformation?",
+    "narrative": "Patient with mild shortness of breath had pulmonary arteriography that revealed a pulmonary arteriovenous malformation. The patient looks for information on risks associated with the condition and prevention of complications.",
+    "topic": "pulmonary arteriovenous malformation",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 187,
+    "question": "why are genetically modified foods bad?",
+    "narrative": "The patient has heard that genetically modified foods are bad for health. She is concerned consuming genetically modified foods can cause health problems.",
+    "topic": "genetically modified foods",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 188,
+    "question": "what other medication can be used to replace ondansetron?",
+    "narrative": "A patient on ondansetron experiences diarrhea and believes it's one of the drug's side-effects. The patient is thinking about asking the doctor for a different drug for nausea, but wants to compare the side effects of these drugs.",
+    "topic": "ondansetron alternatives",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 189,
+    "question": "how to treat skin rash at home?",
+    "narrative": "A young adult with a history of recurring skin rash since early adolescence is looking for alternative treatments.",
+    "topic": "home remedies for skin rash",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 190,
+    "question": "what blood test can indicate cancer?",
+    "narrative": "A patient with family history of cancer is considering one of the multi-cancer screenings advertised online. Before ordering the test, the patient is looking for information on the tests and  their reliability.",
+    "topic": "blood tests for cancer",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 191,
+    "question": "what are tonsils and adenoids, and what is their relationship to malocclusion?",
+    "narrative": "Parents of an eight year-old girl were told that her tonsils and adenoids are enlarged. The girl was also diagnosed with Class II malocclusion. The parents are wondering if the problems are related.",
+    "topic": "malocclusion due to tonsils and adenoids",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 192,
+    "question": "should steroids be avoided if a person has glaucoma?",
+    "narrative": "A glaucoma patient with a mild skin rash is wondering if he can use hydrocortisone cream.",
+    "topic": "steroids and glaucoma",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 193,
+    "question": "migraines what medication have the least side affects?",
+    "narrative": "A woman recently diagnosed with migraines is interested in any medication with the lowest rate and mildest side effects. While she is not planning to have children immediately, she is also concerned with effects on reproductive health and fetus.",
+    "topic": "migraine medications without side effects",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 194,
+    "question": "what is the long-term outlook for the child with jacobsen syndrome? are there any treatments or cures?",
+    "narrative": "A 5-year old girl with mild developmental delay, short stature and other alterations of het body was recently diagnosed with Jacobsen syndrome. The parents are looking for information about treatments, life expectancy and quality of life.",
+    "topic": "outlook for jacobsen syndrome",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 195,
+    "question": "if the value of ca19-9 blood test result exceeds the normal range is it cancer?",
+    "narrative": "A 38-year-old male with family history of colon cancer had a ca19-9 blood test with elevated results. The patient is asking if the elevated results are always associated with cancer or may have other causes.",
+    "topic": "ca19-9 blood test result",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 196,
+    "question": "how is the genetic code of someone with familial hypercholesterolemia different from a healthy person?",
+    "narrative": "A patient diagnosed with familial hypercholesterolemia based on lipid levels, family history and physical exam is wondering if genetic testing is needed and if some specific genetic pathologic variants must be present to confirm the diagnosis.",
+    "topic": "familial hypercholesterolemia genotype",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 197,
+    "question": "does taking decongestants prolong a cold?",
+    "narrative": "A patient with common cold is severely congested and would like to take some over-the-counter decongestants or use home remedies, but is afraid this will only extend the cold.",
+    "topic": "decongestants and cold",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 198,
+    "question": "what will happen to the child\u2019s quality of life if the family is not able to afford treatments for cystic fibrosis?",
+    "narrative": "The parents heard that most children with cystic fibrosis have good quality of life, e.g., attend school and participate in activities. Currently, they cannot enroll in a cystic fibrosis care program. They need to know how the child's life and development will be affected.",
+    "topic": "untreated cystic fibrosis in children",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 199,
+    "question": "blows to the head and when to go to the emergency department?",
+    "narrative": "A 70-year old man lost balance and hit his head against the wall several days ago. He did not experience any symptoms. He now has headaches and feels his gait is not steady. He is wondering if he should visit an emergency department.",
+    "topic": "ER for head injury",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 200,
+    "question": "will e-time harm a person with a history of seizures?",
+    "narrative": "A 21-year-old woman with a history of seizures read that TV and video games may provoke seizures. She would like to know how much screen time is safe and which activities may cause seizures.",
+    "topic": "screen time and seizures",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 201,
+    "question": "why statin taken at bedtime?",
+    "narrative": "The patient wants to know if there are any benefits to taking statins at night. The patient believes the quality of his sleep decreased and taking statins in the morning will restore his sleep.",
+    "topic": "statin taken at night",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 202,
+    "question": "when to consult a fertility specialist for infertility?",
+    "narrative": "A couple in their late 30th is trying to conceive for slightly more than a year. They are worried that it takes so long and consider seeing a fertility specialist.",
+    "topic": "infertility consult",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 203,
+    "question": "what is the timeframe for healing a fractured wrist?",
+    "narrative": "A young boxer broke his wrist. He needs to know when he will recover completely and be able to fully use his wrist.",
+    "topic": "fractured wrist healing",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 204,
+    "question": "what if i decline anastrozole what are chances of cancer?",
+    "narrative": "a patient with family history of cancer was prescribed anastrozole for cancer prevention. She developed a skin rash and is wondering if discontinuing anastrozole will increase her chances of getting cancer.",
+    "topic": "anastrozole cancer prevention",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 205,
+    "question": "what drug can a person with low progesterone levels and trying to conceive take?",
+    "narrative": "A 31-year-old woman is unable to conceive. She is looking for treatments to increase her progesterone levels.",
+    "topic": "progesterone levels for conceiving",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 206,
+    "question": "what does a complex tear involving the lateral meniscus mean? How to treat?",
+    "narrative": "A 32-year-old man with knee pain was diagnosed with complex lateral meniscus tear. He is looking for an explanation of his condition and for best treatments.",
+    "topic": "complex lateral meniscus tear",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 207,
+    "question": "what medicine besides proton pump inhibitor can retard stomach acid? I have polyps in stomach",
+    "narrative": "A patient with gastric polyps and gastric acid hypersecretion is looking for alternatives to proton pump inhibitors.",
+    "topic": "reduce gastric acid secretion",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 208,
+    "question": "my legs are in severe pain always they make cracking noises; what is this and how to stop it?",
+    "narrative": "A 57-year-old male with left lower extremity swelling, pain and crepitus is looking for potential causes and treatments for his condition.",
+    "topic": "leg crepitus and pain",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 209,
+    "question": "is pepcid good for stomach inflammation? what is best to take for stomach inflammation?",
+    "narrative": "A patient with gastritis on famotidine wants to confirm this is the best treatment for her condition.",
+    "topic": "gastritis treatment",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  },
+  {
+    "id": 210,
+    "question": "how will treatment for diabetic foot ulcer with osteomyelitis affect life quality?",
+    "narrative": "a 63\u2010year\u2010old woman with a 10\u2010year history of type 2 diabetes has developed a foot ulcer  with a progressively worsening infection and MRI-confirmed osteomyelitis. She is asking her healthcare provider how the available treatments will affect her quality of life.",
+    "topic": "treatment for diabetic foot ulcer with osteomyelitis",
+    "retrieved_docs": [],
+    "context": "",
+    "answer": null
+  }
+]

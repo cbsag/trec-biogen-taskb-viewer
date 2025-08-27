@@ -1,0 +1,12 @@
+{
+  "name": "trec-biogen-taskb-viewer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static UI + serverless APIs on Vercel to browse and compare Task B answers.",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "vercel dev"
+  },
+  "dependencies": {}
+}

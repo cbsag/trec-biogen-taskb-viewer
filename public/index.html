@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TREC BioGen 2025 — Task B Viewer (Vercel)</title>
+  <style>
+    :root { --accent: #2563eb; --bg: #0b1020; --card: #11172b; --muted: #9aa9d4; --text: #e6ecff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial; background: linear-gradient(160deg,#0b1020,#0d1630); color: var(--text); }
+    header { padding: 20px 24px; border-bottom: 1px solid #1e2746; position: sticky; top: 0; backdrop-filter: blur(6px); background: rgba(11,16,32,0.75); }
+    h1 { margin: 0; font-size: 20px; letter-spacing: 0.2px; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .panel { background: var(--card); border: 1px solid #1e2746; border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .grow { flex: 1; }
+    input[type="text"] { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid #263154; background: #0e1430; color: var(--text); outline: none; }
+    input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
+    .systems { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 999px; border: 1px solid #263154; background: #0e1430; cursor: pointer; user-select: none; }
+    .chip input { accent-color: var(--accent); }
+    .muted { color: var(--muted); font-size: 13px; }
+    .result { border-top: 1px solid #1e2746; padding-top: 16px; margin-top: 16px; }
+    .qid { font-weight: 700; font-size: 12px; color: var(--muted); }
+    .qt { font-size: 16px; font-weight: 600; margin: 6px 0; }
+    .topic { font-size: 13px; color: var(--muted); }
+    details { margin-top: 8px; }
+    summary { cursor: pointer; color: var(--muted); }
+    .answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 12px; }
+    .card { background: #0f1631; border: 1px solid #1f284c; border-radius: 12px; padding: 12px; }
+    .sys { font-weight: 700; margin-bottom: 8px; font-size: 13px; }
+    .ans { white-space: pre-wrap; line-height: 1.35; }
+    .footer { text-align: center; color: var(--muted); padding: 24px; font-size: 13px; }
+    .badge { display:inline-block; background: #10204a; border: 1px solid #1e3a8a; color: #c7d2fe; padding: 2px 8px; font-size: 11px; border-radius: 999px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>TREC BioGen 2025 — Task B Viewer</h1>
+      <div class="muted">Search the 30 questions and compare answers across your systems.</div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="panel">
+      <div class="row">
+        <div class="grow">
+          <input id="q" type="text" placeholder="Search by ID, question, topic, or narrative… (e.g., 'axonal injury' or '181')" />
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="systems" id="systems"></div>
+        <label class="chip" title="Automatically query PubMed for each sentence (rate-limited).">
+          <input type="checkbox" id="autoCiteToggle" />
+          <span>Auto‑cite sentences (PubMed)</span>
+        </label>
+      </div>
+      <div class="muted" id="meta" style="margin-top:8px"></div>
+    </div>
+
+    <div id="results"></div>
+  </div>
+
+  <div class="footer">Deploy on Vercel. Edit system descriptions in <span class="badge">/data/system_descriptions.json</span>.</div>
+
+  <script>
+    const systemsDiv = document.getElementById("systems");
+    const resultsDiv = document.getElementById("results");
+    const metaDiv = document.getElementById("meta");
+    const qInput = document.getElementById("q");
+
+    let allSystems = [];
+    let sysDescriptions = {};
+    let autoCite = false;
+    const AUTO_CITE_PER_ANSWER_LIMIT = 5;  // limit per system answer card
+    const AUTO_CITE_RETMAX = 3;             // top N PubMed matches per sentence
+
+    function selectedSystems() {
+      return Array.from(document.querySelectorAll('.chip input[type="checkbox"]:checked')).map(cb => cb.value);
+    }
+
+    function renderSystems() {
+      systemsDiv.innerHTML = "";
+      allSystems.forEach(sys => {
+        const chip = document.createElement("label");
+        chip.className = "chip";
+        const desc = (sysDescriptions[sys]||"").replace(/"/g,'&quot;');
+        chip.innerHTML = `
+          <input type="checkbox" value="${sys}" checked />
+          <span>${sys}</span>
+          <span class="muted" title="${desc}">ⓘ</span>
+        `;
+        systemsDiv.appendChild(chip);
+        chip.querySelector("input").addEventListener("change", doSearch);
+      });
+    }
+
+    async function fetchSystems() {
+      const r = await fetch("/api/systems");
+      const data = await r.json();
+      allSystems = data.systems || [];
+      sysDescriptions = data.descriptions || {};
+      renderSystems();
+    }
+
+    function splitSentences(text) {
+      if (!text) return [];
+      // Split by punctuation + whitespace while keeping abbreviations somewhat safe
+      // This is a simple splitter; for biomedical text it's okay for UI purposes.
+      const parts = text
+        .replace(/\s+/g, ' ')
+        .split(/(?<=[\.!?])\s+(?=[A-Z0-9])/g);
+      return parts.filter(s => s && s.trim());
+    }
+
+    async function fetchCites(sentence, retmax=5) {
+      const url = `/api/cite?sentence=${encodeURIComponent(sentence)}&retmax=${retmax}`;
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`Citation search failed (${r.status})`);
+      return await r.json();
+    }
+
+    function renderCitations(container, sentence, retmax=5) {
+      container.innerHTML = '<span class="muted">searching…</span>';
+      fetchCites(sentence, retmax).then(data => {
+        if (!data.citations || !data.citations.length) {
+          container.innerHTML = '<span class="muted">no PubMed matches</span>';
+          return;
+        }
+        const ul = document.createElement('ul');
+        ul.style.margin = '6px 0 0 0';
+        ul.style.paddingLeft = '18px';
+        data.citations.forEach(c => {
+          const li = document.createElement('li');
+          const link = document.createElement('a');
+          link.href = c.url;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          link.textContent = `${c.title} (${c.journal}${c.year? ', ' + c.year : ''})`;
+          li.appendChild(link);
+          if (c.doi) {
+            const small = document.createElement('span');
+            small.className = 'muted';
+            small.style.marginLeft = '6px';
+            small.textContent = `doi:${c.doi}`;
+            li.appendChild(small);
+          }
+          ul.appendChild(li);
+        });
+        container.innerHTML = '';
+        container.appendChild(ul);
+      }).catch(err => {
+        container.innerHTML = '<span class="muted">error fetching citations</span>';
+      });
+    }
+
+    function renderResults(data) {
+      resultsDiv.innerHTML = "";
+      metaDiv.textContent = `${data.count} result(s) • showing: ${data.systems.join(", ")}`;
+
+      data.results.forEach(item => {
+        const wrap = document.createElement("div");
+        wrap.className = "panel result";
+
+        const header = document.createElement("div");
+        header.innerHTML = `
+          <div class="qid">ID ${item.id}</div>
+          <div class="qt">${item.question}</div>
+          <div class="topic">Topic: ${item.topic || "—"}</div>
+        `;
+        wrap.appendChild(header);
+
+        const det = document.createElement("details");
+        const sum = document.createElement("summary");
+        sum.textContent = "Show narrative";
+        det.appendChild(sum);
+        const p = document.createElement("div");
+        p.className = "muted";
+        p.style.marginTop = "8px";
+        p.textContent = item.narrative || "—";
+        det.appendChild(p);
+        wrap.appendChild(det);
+
+        const answers = document.createElement("div");
+        answers.className = "answers";
+        Object.entries(item.answers).forEach(([sys, text]) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div class="sys">${sys}</div>
+            <div class="ans"></div>
+          `;
+          answers.appendChild(card);
+          // Populate sentences with per-sentence citation search
+          const ansDiv = card.querySelector('.ans');
+          if (text) {
+            const sents = splitSentences(text);
+            sents.forEach(s => {
+              const row = document.createElement('div');
+              row.style.marginBottom = '6px';
+              const span = document.createElement('span');
+              span.textContent = s;
+
+              const btn = document.createElement('button');
+              btn.textContent = 'Find PubMed cites';
+              btn.style.marginLeft = '8px';
+              btn.style.fontSize = '12px';
+              btn.style.padding = '2px 6px';
+              btn.style.borderRadius = '8px';
+              btn.style.border = '1px solid #263154';
+              btn.style.background = '#0e1430';
+              btn.style.color = 'var(--text)';
+              btn.style.cursor = 'pointer';
+
+              const slot = document.createElement('div');
+              slot.className = 'muted';
+              slot.style.fontSize = '12px';
+              slot.style.marginTop = '4px';
+
+              btn.addEventListener('click', () => {
+                renderCitations(slot, s, 5);
+              });
+              row.appendChild(span);
+              row.appendChild(btn);
+              row.appendChild(slot);
+              ansDiv.appendChild(row);
+              // Auto-cite (rate-limited per card)
+              if (autoCite && ansDiv.childElementCount <= AUTO_CITE_PER_ANSWER_LIMIT) {
+                renderCitations(slot, s, AUTO_CITE_RETMAX);
+              }
+});
+          } else {
+            ansDiv.innerHTML = "<span class='muted'>— no answer —</span>";
+          }
+        });
+        wrap.appendChild(answers);
+        resultsDiv.appendChild(wrap);
+      });
+    }
+
+    async function doSearch() {
+      const q = qInput.value;
+      const selected = selectedSystems();
+      const url = `/api/search?q=${encodeURIComponent(q)}&systems=${encodeURIComponent(selected.join(","))}`;
+      const r = await fetch(url);
+      const data = await r.json();
+      renderResults(data);
+    }
+
+    qInput.addEventListener("input", () => {
+      clearTimeout(window.__q_timer);
+      window.__q_timer = setTimeout(doSearch, 120);
+    });
+
+    (async function init() {
+      await fetchSystems();
+      await doSearch();
+      qInput.focus();
+      const t = document.getElementById('autoCiteToggle');
+      if (t) {
+        const saved = localStorage.getItem('autoCite') === 'true';
+        t.checked = saved; autoCite = saved;
+        t.addEventListener('change', () => {
+          autoCite = t.checked; localStorage.setItem('autoCite', String(autoCite));
+          // re-run to annotate again if enabled
+          doSearch();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
