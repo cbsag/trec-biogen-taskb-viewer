@@ -1,4 +1,5 @@
-const { SYSTEMS, SYSTEM_ANSWERS, searchItems } = require("./_data");
+// /api/search.js
+const { SYSTEMS, SYSTEM_ANSWERS, SYSTEM_PMIDS, searchItems } = require("./_data");
 
 module.exports = async (req, res) => {
   try {
@@ -12,16 +13,10 @@ module.exports = async (req, res) => {
     }
     const items = searchItems(q);
     const payload = items.map(it => {
-      const row = {
-        id: it.id,
-        question: it.question || "",
-        topic: it.topic || "",
-        narrative: it.narrative || "",
-        answers: {}
-      };
+      const row = { id: it.id, question: it.question || "", topic: it.topic || "", narrative: it.narrative || "", answers: {}, pmids: {} };
       for (const s of selected) {
-        const ans = (SYSTEM_ANSWERS[s] && SYSTEM_ANSWERS[s][it.id]) || "";
-        row.answers[s] = ans;
+        row.answers[s] = (SYSTEM_ANSWERS[s] && SYSTEM_ANSWERS[s][it.id]) || "";
+        row.pmids[s]   = (SYSTEM_PMIDS[s]   && SYSTEM_PMIDS[s][it.id])   || [];
       }
       return row;
     });
