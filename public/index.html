@@ -3,18 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TREC BioGen 2025 — Task B Viewer (Vercel)</title>
+  <title>TREC BioGen 2025 — Task B</title>
   <style>
     :root{
       --bg:#0d0f1a; --bg2:#10142a; --card:#141a33; --text:#e8ecff; --muted:#a7b4dd;
       --accent:#7c3aed; --accent-weak:#32215a;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
-      color:var(--text); background:#0d0f1a;
-    }
-    header{position:sticky;top:0;z-index:10;padding:20px 24px;border-bottom:1px solid #1e2746;background:rgba(13,15,26,.7);backdrop-filter:blur(6px)}
+    body{ margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial; color:var(--text); background:#0d0f1a; }
+    header{position:sticky;top:0;z-index:10;padding:20px 24px;border-bottom:1px solid #1e2746;background:rgba(13,15,26,.7);backdrop-filter:blur(6px);
+      transition:transform .35s ease, opacity .35s ease}
+    .header--hidden{ transform:translateY(-100%); opacity:0; pointer-events:none }
     h1{margin:0;font-size:22px}
     .nav{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted)}
     .nav a{color:#cdb8ff;text-decoration:none}
@@ -22,9 +21,7 @@
 
     .container{max-width:1100px;margin:0 auto;padding:16px 24px 24px}
 
-    #landing{
-      position:relative;height:72vh;display:flex;align-items:center;justify-content:center;overflow:hidden
-    }
+    #landing{ position:relative;height:72vh;display:flex;align-items:center;justify-content:center;overflow:hidden }
     #anim{
       position:absolute;inset:0;background:
         radial-gradient(40% 60% at 20% 10%, #1b1f46 0%, transparent 60%),
@@ -37,10 +34,7 @@
     .hero{position:relative;text-align:center}
     .hero h2{font-size:40px;margin:0 0 8px}
     .hero p{color:var(--muted);margin:0 0 18px}
-    .hero .cta{
-      font-size:16px;padding:10px 16px;border-radius:12px;border:1px solid #2a3560;
-      background:linear-gradient(90deg,#2b1e52,#291e68);color:#fff;cursor:pointer
-    }
+    .hero .cta{ font-size:16px;padding:10px 16px;border-radius:12px;border:1px solid #2a3560;background:linear-gradient(90deg,#2b1e52,#291e68);color:#fff;cursor:pointer }
     .hero .cta:hover{box-shadow:0 0 0 3px rgba(124,58,237,.25)}
 
     .panel{background:var(--card);border:1px solid #1f284c;border-radius:16px;padding:20px;margin-bottom:18px}
@@ -89,82 +83,81 @@
   </style>
 </head>
 <body>
-    <header>
-      <div class="container">
-        <div class="nav">
-          <h1 style="margin-right:auto;">TREC BioGen 2025 — Task B Viewer</h1>
-          <a href="#home" id="navHome">Home</a>
-          <a href="#viewer" id="navViewer">Viewer</a>
-          <a href="https://github.com/cbsag/trec-biogen-taskb-viewer" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://www.linkedin.com/in/your-link" target="_blank" rel="noopener">LinkedIn</a>
-        </div>
-      </div>
-    </header>
-  
-    <section id="landing">
-      <div id="anim"></div>
-      <div class="hero">
-        <h2>Biomedical QA, grounded & comparable</h2>
-        <p>Explore 30 TREC BioGen Task-B topics and compare system answers sentence-by-sentence with PubMed citations.</p>
-        <button class="cta" id="openViewerBtn">Open Viewer</button>
-      </div>
-    </section>
-    
-    <div class="container" id="viewer" style="display:none">
-      <div class="panel">
-        <div class="row">
-          <div class="grow"><input id="q" type="text" placeholder="Search by ID, question, topic, or narrative… (e.g., ‘axonal injury’ or ‘181’)" /></div>
-        </div>
-        <div class="row" style="margin-top:10px">
-          <div class="systems" id="systems"></div>
-          <label class="chip" title="Automatically query PubMed for the first few sentences (rate-limited)">
-            <input type="checkbox" id="autoCiteToggle" />
-            <span>Auto-cite sentences (PubMed)</span>
-          </label>
-          <div class="toolbar">
-            <label class="muted">View</label>
-            <select id="viewMode" class="select">
-              <option value="auto" selected>Auto (Tabs if multiple)</option>
-              <option value="tabs">Tabs</option>
-              <option value="columns">Columns</option>
-            </select>
-            <label class="muted">Text size</label>
-            <select id="textSize" class="select">
-              <option value="1.55">Comfort</option>
-              <option value="1.65" selected>Relaxed</option>
-              <option value="1.8">Spacious</option>
-            </select>
-          </div>
-          <div class="muted" id="meta" style="margin-top:6px"></div>
-        </div>
-        <div id="results"></div>
+  <!-- header hidden on first load -->
+  <header id="topHeader" class="header--hidden">
+    <div class="container">
+      <div class="nav">
+        <h1 style="margin-right:auto;">TREC BioGen 2025 — Task B</h1>
+        <a href="#home" id="navHome">Home</a>
+        <a href="#task" id="navTask">Task</a>
+        <a href="https://github.com/cbsag/trec-biogen-taskb-viewer" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/your-link" target="_blank" rel="noopener">LinkedIn</a>
       </div>
     </div>
-  <!-- <div class="container" id="viewer">
+  </header>
+
+  <!-- landing: 2-step -->
+  <section id="landing">
+    <div id="anim"></div>
+
+    <!-- slide 1 -->
+    <div class="hero" id="hero1">
+      <h2 style="font-size:46px;margin:0 0 10px">TREC BioGen 2025 — Task B</h2>
+      <p>Generate answers for 30 medical questions and compare systems.</p>
+      <button class="cta" id="nextBtn">Next</button>
+    </div>
+
+    <!-- slide 2 -->
+    <div class="hero" id="hero2" style="display:none">
+      <h2>Biomedical QA, grounded &amp; comparable</h2>
+      <p>Explore 30 TREC BioGen Task-B topics and compare system answers sentence-by-sentence with PubMed citations.</p>
+      <button class="cta" id="openViewerBtn">Open Viewer</button>
+    </div>
+  </section>
+
+  <!-- task description -->
+  <section id="task" class="container" style="display:none">
+    <div class="panel">
+      <h3 style="margin:0 0 8px">Task description</h3>
+      <div class="muted">
+        This viewer loads the official 30 topics for TREC BioGen 2025 Task B and shows answers from multiple systems.
+        Select one or more systems to compare; expand “Cited PMIDs” to view paper titles and abstracts via PubMed (EFetch).
+        Use the view control to switch Tabs/Columns for multi-system reading.
+      </div>
+    </div>
+  </section>
+
+  <!-- viewer -->
+  <div class="container" id="viewer" style="display:none">
     <div class="panel">
       <div class="row">
-        <div class="grow">
-          <input id="q" type="text" placeholder="Search by ID, question, topic, or narrative… (e.g., 'axonal injury' or '181')" />
-        </div>
+        <div class="grow"><input id="q" type="text" placeholder="Search by ID, question, topic, or narrative… (e.g., ‘axonal injury’ or ‘181’)" /></div>
       </div>
       <div class="row" style="margin-top:10px">
         <div class="systems" id="systems"></div>
-        <label class="chip" title="Automatically query PubMed for each sentence (rate-limited).">
+        <label class="chip" title="Automatically query PubMed for the first few sentences (rate-limited)">
           <input type="checkbox" id="autoCiteToggle" />
-          <span>Auto‑cite sentences (PubMed)</span>
+          <span>Auto-cite sentences (PubMed)</span>
         </label>
+        <div class="toolbar">
+          <label class="muted">View</label>
+          <select id="viewMode" class="select">
+            <option value="auto" selected>Auto (Tabs if multiple)</option>
+            <option value="tabs">Tabs</option>
+            <option value="columns">Columns</option>
+          </select>
+          <label class="muted">Text size</label>
+          <select id="textSize" class="select">
+            <option value="1.55">Comfort</option>
+            <option value="1.65" selected>Relaxed</option>
+            <option value="1.8">Spacious</option>
+          </select>
+        </div>
+        <div class="muted" id="meta" style="margin-top:6px"></div>
       </div>
-      <div class="muted" id="meta" style="margin-top:8px"></div>
+      <div id="results"></div>
     </div>
-
-    <div id="results"></div>
   </div>
-
- <div class="footer">
-  ~ cbsag ·
-  <a href="https://github.com/cbsag" target="_blank" rel="noopener">GitHub</a> ·
-  <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a>
-</div> -->
 
   <script>
     const systemsDiv = document.getElementById("systems");
@@ -175,50 +168,52 @@
     let allSystems = [];
     let sysDescriptions = {};
     let autoCite = false;
-    const AUTO_CITE_PER_ANSWER_LIMIT = 3;  // limit per system answer card
-    const AUTO_CITE_RETMAX = 3;             // top N PubMed matches per sentence
 
+    // landing / header controls
     const landing = document.getElementById('landing');
-    const viewer = document.getElementById('viewer');
+    const viewer  = document.getElementById('viewer');
+    const taskSec = document.getElementById('task');
+    const headerEl = document.getElementById('topHeader');
+    const hero1 = document.getElementById('hero1');
+    const hero2 = document.getElementById('hero2');
+    const nextBtn = document.getElementById('nextBtn');
     const openBtn = document.getElementById('openViewerBtn');
     const navHome = document.getElementById('navHome');
-    const navViewer = document.getElementById('navViewer');
+    const navTask = document.getElementById('navTask');
     const textSizeSel = document.getElementById('textSize');
     const viewModeSel = document.getElementById('viewMode');
 
-    function showViewer() {
-      landing.style.display = 'none';
-      viewer.style.display = 'block';
-      qInput.focus();
-    }
-    function showLanding() {
-      viewer.style.display = 'none';
-      landing.style.display = 'flex';
-    }
+    function goHero2(){ hero1.style.display='none'; hero2.style.display='block'; headerEl.classList.remove('header--hidden'); }
+    function showViewer(){ landing.style.display='none'; taskSec.style.display='none'; viewer.style.display='block'; headerEl.classList.remove('header--hidden'); qInput.focus(); }
+    function showLanding(){ viewer.style.display='none'; taskSec.style.display='none'; landing.style.display='flex'; headerEl.classList.add('header--hidden'); hero2.style.display='none'; hero1.style.display='block'; }
+    function showTask(){ landing.style.display='none'; viewer.style.display='none'; taskSec.style.display='block'; headerEl.classList.remove('header--hidden'); }
+
+    nextBtn.addEventListener('click', goHero2);
     openBtn.addEventListener('click', showViewer);
-    navViewer.addEventListener('click', (e)=>{ e.preventDefault(); showViewer(); });
     navHome.addEventListener('click', (e)=>{ e.preventDefault(); showLanding(); });
+    navTask.addEventListener('click', (e)=>{ e.preventDefault(); showTask(); });
 
-    document.addEventListener('keydown', (e)=>{
-      if (e.key === '/') { showViewer(); qInput.focus(); e.preventDefault(); }
-    });
+    // reveal header on interaction from landing
+    let revealed=false;
+    function reveal(){ if(revealed) return; revealed=true; goHero2(); }
+    window.addEventListener('wheel', reveal, {passive:true});
+    window.addEventListener('touchmove', reveal, {passive:true});
+    window.addEventListener('keydown', (e)=>{ if(['ArrowDown','PageDown',' '].includes(e.key)) reveal(); if(e.key==='/'){ showViewer(); qInput.focus(); e.preventDefault(); }});
 
-    textSizeSel.addEventListener('change', ()=>{
-      document.querySelectorAll('.ans').forEach(a => a.style.lineHeight = textSizeSel.value);
-    });
+    textSizeSel.addEventListener('change', ()=>{ document.querySelectorAll('.ans').forEach(a => a.style.lineHeight = textSizeSel.value); });
 
-    function selectedSystems() {
+    function selectedSystems(){
       return Array.from(document.querySelectorAll('.chip input[type="checkbox"]:checked')).map(cb => cb.value);
     }
 
-    function renderSystems() {
+    function renderSystems(){
       systemsDiv.innerHTML = "";
       allSystems.forEach(sys => {
         const chip = document.createElement("label");
         chip.className = "chip";
         const desc = (sysDescriptions[sys]||"").replace(/"/g,'&quot;');
         chip.innerHTML = `
-          <input type="checkbox" value="${sys}" checked />
+          <input type="checkbox" value="${sys}" />
           <span>${sys}</span>
           <span class="muted" title="${desc}">ⓘ</span>
         `;
@@ -227,7 +222,7 @@
       });
     }
 
-    async function fetchSystems() {
+    async function fetchSystems(){
       const r = await fetch("/api/systems");
       const data = await r.json();
       allSystems = data.systems || [];
@@ -235,284 +230,60 @@
       renderSystems();
     }
 
-    function splitSentences(text) {
+    // bullet-friendly splitter
+    function splitSentences(text){
       if (!text) return [];
-      // Split by punctuation + whitespace while keeping abbreviations somewhat safe
-      // This is a simple splitter; for biomedical text it's okay for UI purposes.
-      const parts = text
-        .replace(/\s+/g, ' ')
-        .split(/(?<=[\.!?])\s+(?=[A-Z0-9])/g);
-      return parts.filter(s => s && s.trim());
+      const normalized = String(text)
+        .replace(/\r\n/g, '\n')
+        .replace(/[•●▪■]+/g, '\n')
+        .replace(/\u2022/g, '\n')
+        .replace(/\s+\n/g, '\n')
+        .trim();
+      const lines = normalized.split(/\n+/g);
+      const out = [];
+      for (const line of lines) {
+        const parts = line.trim().split(/(?<=[.!?])\s+(?=[A-Z0-9])/g).map(s=>s.trim()).filter(Boolean);
+        if (parts.length) out.push(...parts);
+      }
+      return out;
     }
 
-    // async function fetchCites(sentence, retmax=5) {
-    //   const url = `/api/cite?sentence=${encodeURIComponent(sentence)}&retmax=${retmax}`;
-    //   const r = await fetch(url);
-    //   if (!r.ok) throw new Error(`Citation search failed (${r.status})`);
-    //   return await r.json();
-    // }
+    // sentence→PubMed (optional quick cites)
+    const RATE_MS = 150;
+    let _citeQ = Promise.resolve();
+    const _citeCache = new Map();
 
-    // function renderCitations(container, sentence, retmax=5) {
-    //   container.innerHTML = '<span class="muted">searching…</span>';
-    //   fetchCites(sentence, retmax).then(data => {
-    //     if (!data.citations || !data.citations.length) {
-    //       container.innerHTML = '<span class="muted">no PubMed matches</span>';
-    //       return;
-    //     }
-    //     const ul = document.createElement('ul');
-    //     ul.style.margin = '6px 0 0 0';
-    //     ul.style.paddingLeft = '18px';
-    //     data.citations.forEach(c => {
-    //       const li = document.createElement('li');
-    //       const link = document.createElement('a');
-    //       link.href = c.url;
-    //       link.target = '_blank';
-    //       link.rel = 'noopener';
-    //       link.textContent = `${c.title} (${c.journal}${c.year? ', ' + c.year : ''})`;
-    //       li.appendChild(link);
-    //       if (c.doi) {
-    //         const small = document.createElement('span');
-    //         small.className = 'muted';
-    //         small.style.marginLeft = '6px';
-    //         small.textContent = `doi:${c.doi}`;
-    //         li.appendChild(small);
-    //       }
-    //       ul.appendChild(li);
-    //     });
-    //     container.innerHTML = '';
-    //     container.appendChild(ul);
-    //   }).catch(err => {
-    //     container.innerHTML = '<span class="muted">error fetching citations</span>';
-    //   });
-    // }
-    let _citeCache = new Map();    // front-end cache by exact sentence
-    const RATE_MS = 150;            // top N PubMed matches per
-    let _citeQ = Promise.resolve(); // queue to serialize bursts
+    async function fetchCites(sentence, retmax=3){
+      const key = `${sentence}::${retmax}`;
+      if (_citeCache.has(key)) return _citeCache.get(key);
+      _citeQ = _citeQ.then(()=>new Promise(r=>setTimeout(r,RATE_MS)));
+      await _citeQ;
+      const r = await fetch(`/api/cite?sentence=${encodeURIComponent(sentence)}&retmax=${retmax}`);
+      const data = await r.json().catch(()=>({}));
+      _citeCache.set(key, data);
+      return data;
+    }
 
-      async function fetchCites(sentence, retmax=5) {
-        const key = `${sentence}::${retmax}`;
-        if (_citeCache.has(key)) return _citeCache.get(key);
-        const url = `/api/cite?sentence=${encodeURIComponent(sentence)}&retmax=${retmax}`;
-        // queue it to respect rate
-        _citeQ = _citeQ.then(() => new Promise((resolve) => setTimeout(resolve, RATE_MS)));
-        await _citeQ;
-        const r = await fetch(url);
-        const data = await r.json().catch(() => ({}));
-        _citeCache.set(key, data);
-        return data;
-      }
-
-      function renderCitations(container, sentence, retmax=5) {
-        container.innerHTML = '<span class="muted">searching…</span>';
-        fetchCites(sentence, retmax).then(data => {
-          if (data.error) {
-            container.innerHTML = `<span class="muted">error: ${data.error}</span>`;
-            return;
-          }
-          if (!data.citations || !data.citations.length) {
-            container.innerHTML = '<span class="muted">no PubMed matches</span>';
-            return;
-          }
-          const ul = document.createElement('ul');
-          ul.style.margin = '8px 0 0 0';
-          ul.style.paddingLeft = '18px';
-          data.citations.forEach(c => {
-            const li = document.createElement('li');
-            const link = document.createElement('a');
-            link.href = c.url; link.target = "_blank"; link.rel = "noopener";
-            link.textContent = `${c.title} (${c.journal}${c.year ? ', ' + c.year : ''})`;
-            li.appendChild(link);
-            if (c.doi) {
-              const small = document.createElement('span');
-              small.className = 'muted'; small.style.marginLeft = '6px';
-              small.textContent = `doi:${c.doi}`;
-              li.appendChild(small);
-            }
-            ul.appendChild(li);
-          });
-          container.innerHTML = ''; container.appendChild(ul);
-        }).catch(err => {
-          container.innerHTML = `<span class="muted">error: ${String(err.message || err)}</span>`;
+    function renderCitations(container, sentence, retmax=3){
+      container.innerHTML = '<span class="muted">searching…</span>';
+      fetchCites(sentence, retmax).then(data=>{
+        if (data.error) { container.innerHTML = `<span class="muted">error: ${data.error}</span>`; return; }
+        if (!data.citations || !data.citations.length) { container.innerHTML = '<span class="muted">no PubMed matches</span>'; return; }
+        const ul = document.createElement('ul'); ul.style.margin='8px 0 0 0'; ul.style.paddingLeft='18px';
+        data.citations.forEach(c=>{
+          const li = document.createElement('li');
+          const a = document.createElement('a'); a.href=c.url; a.target='_blank'; a.rel='noopener';
+          a.textContent = `${c.title} (${c.journal}${c.year?', '+c.year:''})`;
+          li.appendChild(a);
+          if (c.doi){ const d=document.createElement('span'); d.className='muted'; d.style.marginLeft='6px'; d.textContent=`doi:${c.doi}`; li.appendChild(d); }
+          ul.appendChild(li);
         });
-      }
-    
-    function addPMIDsSection(card, item, sys) {
-      const pmids = (item.pmids && item.pmids[sys]) || [];
-      if (!pmids.length) return;
-
-      const btn = document.createElement('button');
-      btn.className = 'btn';
-      btn.textContent = `Cited PMIDs (${pmids.length})`;
-
-      const slot = document.createElement('div');
-      slot.className = 'muted';
-      slot.style.marginTop = '8px';
-
-      btn.addEventListener('click', () => renderPMIDList(slot, pmids));
-
-      // place after sentences
-      card.appendChild(btn);
-      card.appendChild(slot);
-    }
-  
-    function renderResults(data) {
-      resultsDiv.innerHTML = "";
-      metaDiv.textContent = `${data.count} result(s) • showing: ${data.systems.join(", ")}`;
-
-      data.results.forEach(item => {
-        const wrap = document.createElement("div");
-        wrap.className = "panel result";
-
-        // header
-        const header = document.createElement("div");
-        header.innerHTML = `
-          <div class="qid">ID ${item.id}</div>
-          <div class="qt">${item.question}</div>
-          <div class="topic">Topic: ${item.topic || "—"}</div>
-        `;
-        wrap.appendChild(header);
-
-        // narrative
-        const det = document.createElement("details");
-        const sum = document.createElement("summary");
-        sum.textContent = "Show narrative";
-        det.appendChild(sum);
-        const p = document.createElement("div");
-        p.className = "muted";
-        p.style.marginTop = "8px";
-        p.textContent = item.narrative || "—";
-        det.appendChild(p);
-        wrap.appendChild(det);
-
-        // answers area
-        const answersWrap = document.createElement("div");
-        answersWrap.className = "answers";
-
-        // systems with non-empty answers
-        const sysList = Object.entries(item.answers).filter(([, text]) => text && text.trim());
-        const multi = sysList.length > 1;
-        const mode = viewModeSel.value === 'auto' ? (multi ? 'tabs' : 'single') : viewModeSel.value;
-
-        if (!multi || mode === 'single') {
-          // ONE big card
-          const [sys, text] = sysList[0] || Object.entries(item.answers)[0] || ["System", ""];
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `<div class="sys">${sys}</div><div class="ans"></div>`;
-          answersWrap.appendChild(card);
-          populateSentences(card.querySelector('.ans'), text);
-          addPMIDsSection(card, item, sys);
-
-        } else if (mode === 'tabs') {
-          // TABS
-          const tabs = document.createElement('div'); tabs.className = 'tabs';
-          const contents = document.createElement('div');
-
-          sysList.forEach(([sys, text], idx) => {
-            const t = document.createElement('button');
-            t.className = 'tab' + (idx === 0 ? ' active' : '');
-            t.textContent = sys;
-            tabs.appendChild(t);
-
-            const c = document.createElement('div');
-            c.className = 'tabcontent' + (idx === 0 ? ' active' : '');
-            const card = document.createElement('div'); card.className = 'card';
-            card.innerHTML = `<div class="sys">${sys}</div><div class="ans"></div>`;
-            c.appendChild(card);
-            contents.appendChild(c);
-
-            populateSentences(card.querySelector('.ans'), text);
-            addPMIDsSection(card, item, sys);
-
-            t.addEventListener('click', () => {
-              tabs.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-              contents.querySelectorAll('.tabcontent').forEach(x => x.classList.remove('active'));
-              t.classList.add('active'); c.classList.add('active');
-            });
-          });
-
-          answersWrap.appendChild(tabs);
-          answersWrap.appendChild(contents);
-
-        } else {
-          // COLUMNS
-          const grid = document.createElement('div');
-          grid.style.display = 'grid';
-          grid.style.gridTemplateColumns = `repeat(${Math.min(sysList.length, 3)}, minmax(320px, 1fr))`;
-          grid.style.gap = '16px';
-
-          sysList.forEach(([sys, text]) => {
-            const card = document.createElement('div'); card.className = 'card';
-            card.innerHTML = `<div class="sys">${sys}</div><div class="ans"></div>`;
-            grid.appendChild(card);
-            populateSentences(card.querySelector('.ans'), text);
-            addPMIDsSection(card, item, sys);
-          });
-
-          answersWrap.appendChild(grid);
-        }
-
-        wrap.appendChild(answersWrap);
-        resultsDiv.appendChild(wrap);
-      });
+        container.innerHTML=''; container.appendChild(ul);
+      }).catch(err=>{ container.innerHTML = `<span class="muted">error: ${String(err.message||err)}</span>`; });
     }
 
-
-    async function doSearch() {
-      const q = qInput.value;
-      const selected = selectedSystems();
-      // resultsDiv.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="muted">Loading answers…</div></div>`;
-      resultsDiv.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="muted">Loading answers…</div></div>`;
-
-      const url = `/api/search?q=${encodeURIComponent(q)}&systems=${encodeURIComponent(selected.join(","))}`;
-      const r = await fetch(url);
-      const data = await r.json();
-      renderResults(data);
-    }
-
-    qInput.addEventListener("input", () => {
-      clearTimeout(window.__q_timer);
-      window.__q_timer = setTimeout(doSearch, 120);
-    });
-
-    (async function init() {
-      await fetchSystems();
-      await doSearch();
-      qInput.focus();
-      const t = document.getElementById('autoCiteToggle');
-      if (t) {
-        const saved = localStorage.getItem('autoCite') === 'true';
-        t.checked = saved; autoCite = saved;
-        t.addEventListener('change', () => {
-          autoCite = t.checked; localStorage.setItem('autoCite', String(autoCite));
-          // re-run to annotate again if enabled
-          doSearch();
-        });
-      }
-    })();
-    function populateSentences(ansDiv, text) {
-      ansDiv.style.lineHeight = textSizeSel.value;
-      if (!text) { ansDiv.innerHTML = "<span class='muted'>— no answer —</span>"; return; }
-      const sents = splitSentences(text);
-      sents.forEach((s, idx) => {
-        const row = document.createElement('div'); row.className = 'srow';
-        const dot = document.createElement('span'); dot.className = 'bullet';
-        const span = document.createElement('span'); span.className = 'text'; span.textContent = s;
-        const actions = document.createElement('span'); actions.className = 'actions';
-        const btn = document.createElement('button'); btn.className = 'btn'; btn.textContent = 'Find PubMed cites';
-
-        const slot = document.createElement('div'); slot.className = 'muted'; slot.style.marginTop = '6px';
-
-        btn.addEventListener('click', ()=> renderCitations(slot, s, 5));
-        actions.appendChild(btn);
-
-        row.appendChild(dot); row.appendChild(span); row.appendChild(actions); row.appendChild(slot);
-        ansDiv.appendChild(row);
-
-        if (autoCite && idx < AUTO_CITE_PER_ANSWER_LIMIT) renderCitations(slot, s, AUTO_CITE_RETMAX);
-      });
-    }
-    async function fetchPMIDsDetails(pmids) {
+    // PMIDs → title/abstract
+    async function fetchPMIDsDetails(pmids){
       const key = pmids.join(",");
       if (!window.__pmidCache) window.__pmidCache = new Map();
       if (window.__pmidCache.has(key)) return window.__pmidCache.get(key);
@@ -521,36 +292,147 @@
       window.__pmidCache.set(key, data);
       return data;
     }
-
-    function renderPMIDList(container, pmids) {
+    function renderPMIDList(container, pmids){
       container.innerHTML = '<span class="muted">loading citations…</span>';
-      fetchPMIDsDetails(pmids).then(data => {
-        if (data.error) { container.innerHTML = `<span class="muted">error: ${data.error}</span>`; return; }
-        if (!data.items || !data.items.length) { container.innerHTML = '<span class="muted">no details returned</span>'; return; }
-        const ul = document.createElement('ul');
-        ul.style.margin = '8px 0 0 0'; ul.style.paddingLeft = '18px';
-
-        data.items.forEach(p => {
-          const li = document.createElement('li');
-          const a = document.createElement('a'); a.href = p.url; a.target='_blank'; a.rel='noopener';
-          a.textContent = `${p.title} (${p.journal}${p.year ? ', ' + p.year : ''})`;
+      fetchPMIDsDetails(pmids).then(data=>{
+        if (data.error){ container.innerHTML = `<span class="muted">error: ${data.error}</span>`; return; }
+        if (!data.items || !data.items.length){ container.innerHTML = '<span class="muted">no details returned</span>'; return; }
+        const ul=document.createElement('ul'); ul.style.margin='8px 0 0 0'; ul.style.paddingLeft='18px';
+        data.items.forEach(p=>{
+          const li=document.createElement('li');
+          const a=document.createElement('a'); a.href=p.url; a.target='_blank'; a.rel='noopener';
+          a.textContent = `${p.title} (${p.journal}${p.year?', '+p.year:''})`;
           li.appendChild(a);
-          if (p.doi) { const d = document.createElement('span'); d.className='muted'; d.style.marginLeft='6px'; d.textContent = `doi:${p.doi}`; li.appendChild(d); }
-
-          if (p.abstract) {
-            const det = document.createElement('details'); det.style.marginTop='6px';
-            const sum = document.createElement('summary'); sum.textContent = 'Show abstract';
-            const abs = document.createElement('div'); abs.className='muted'; abs.style.marginTop='6px'; abs.style.whiteSpace='pre-wrap'; abs.textContent = p.abstract;
-            det.appendChild(sum); det.appendChild(abs);
-            li.appendChild(det);
+          if (p.doi){ const d=document.createElement('span'); d.className='muted'; d.style.marginLeft='6px'; d.textContent=`doi:${p.doi}`; li.appendChild(d); }
+          if (p.abstract){
+            const det=document.createElement('details'); det.style.marginTop='6px';
+            const sum=document.createElement('summary'); sum.textContent='Show abstract';
+            const abs=document.createElement('div'); abs.className='muted'; abs.style.marginTop='6px'; abs.style.whiteSpace='pre-wrap'; abs.textContent=p.abstract;
+            det.appendChild(sum); det.appendChild(abs); li.appendChild(det);
           }
           ul.appendChild(li);
         });
-        container.innerHTML = ''; container.appendChild(ul);
-      }).catch(err => { container.innerHTML = `<span class="muted">error: ${String(err.message || err)}</span>`; });
+        container.innerHTML=''; container.appendChild(ul);
+      }).catch(err=>{ container.innerHTML = `<span class="muted">error: ${String(err.message||err)}</span>`; });
     }
 
+    function addPMIDsSection(card, item, sys){
+      const pmids = (item.pmids && item.pmids[sys]) || [];
+      if (!pmids.length) return;
+      const btn=document.createElement('button'); btn.className='btn'; btn.textContent=`Cited PMIDs (${pmids.length})`;
+      const slot=document.createElement('div'); slot.className='muted'; slot.style.marginTop='8px';
+      btn.addEventListener('click', ()=>renderPMIDList(slot, pmids));
+      card.appendChild(btn); card.appendChild(slot);
+    }
 
+    function populateSentences(ansDiv, text){
+      ansDiv.style.lineHeight = textSizeSel.value;
+      if (!text){ ansDiv.innerHTML="<span class='muted'>— no answer —</span>"; return; }
+      const sents = splitSentences(text);
+      sents.forEach((s, idx)=>{
+        const row=document.createElement('div'); row.className='srow';
+        const dot=document.createElement('span'); dot.className='bullet';
+        const span=document.createElement('span'); span.className='text'; span.textContent=s;
+        const actions=document.createElement('span'); actions.className='actions';
+        const btn=document.createElement('button'); btn.className='btn'; btn.textContent='Find PubMed cites';
+        const slot=document.createElement('div'); slot.className='muted'; slot.style.marginTop='6px';
+        btn.addEventListener('click', ()=>renderCitations(slot, s, 3));
+        actions.appendChild(btn);
+        row.appendChild(dot); row.appendChild(span); row.appendChild(actions); row.appendChild(slot);
+        ansDiv.appendChild(row);
+        if (autoCite && idx < 3) renderCitations(slot, s, 3);
+      });
+    }
+
+    function renderResults(data){
+      resultsDiv.innerHTML = "";
+      metaDiv.textContent = `${data.count} result(s) • showing: ${data.systems.join(", ")}`;
+
+      data.results.forEach(item=>{
+        const wrap=document.createElement("div"); wrap.className="panel result";
+
+        const header=document.createElement("div");
+        header.innerHTML = `
+          <div class="qid">ID ${item.id}</div>
+          <div class="qt">${item.question}</div>
+          <div class="topic">Topic: ${item.topic || "—"}</div>
+        `;
+        wrap.appendChild(header);
+
+        const det=document.createElement("details");
+        const sum=document.createElement("summary"); sum.textContent="Show narrative";
+        det.appendChild(sum);
+        const p=document.createElement("div"); p.className="muted"; p.style.marginTop="8px"; p.textContent=item.narrative || "—";
+        det.appendChild(p);
+        wrap.appendChild(det);
+
+        const answersWrap=document.createElement("div"); answersWrap.className="answers";
+        const sysList = Object.entries(item.answers).filter(([,text])=>text && text.trim());
+        const multi = sysList.length > 1;
+        const mode = viewModeSel.value === 'auto' ? (multi ? 'tabs' : 'single') : viewModeSel.value;
+
+        if (!multi || mode === 'single'){
+          const [sys, text] = sysList[0] || Object.entries(item.answers)[0] || ["System",""];
+          const card=document.createElement('div'); card.className='card';
+          card.innerHTML = `<div class="sys">${sys}</div><div class="ans"></div>`;
+          answersWrap.appendChild(card);
+          populateSentences(card.querySelector('.ans'), text); addPMIDsSection(card, item, sys);
+        } else if (mode === 'tabs'){
+          const tabs=document.createElement('div'); tabs.className='tabs';
+          const contents=document.createElement('div');
+          sysList.forEach(([sys,text], idx)=>{
+            const t=document.createElement('button'); t.className='tab'+(idx===0?' active':''); t.textContent=sys; tabs.appendChild(t);
+            const c=document.createElement('div'); c.className='tabcontent'+(idx===0?' active':'');
+            const card=document.createElement('div'); card.className='card'; card.innerHTML=`<div class="sys">${sys}</div><div class="ans"></div>`;
+            c.appendChild(card); contents.appendChild(c);
+            populateSentences(card.querySelector('.ans'), text); addPMIDsSection(card, item, sys);
+            t.addEventListener('click', ()=>{ tabs.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); contents.querySelectorAll('.tabcontent').forEach(x=>x.classList.remove('active')); t.classList.add('active'); c.classList.add('active'); });
+          });
+          answersWrap.appendChild(tabs); answersWrap.appendChild(contents);
+        } else {
+          const grid=document.createElement('div'); grid.style.display='grid'; grid.style.gridTemplateColumns=`repeat(${Math.min(sysList.length,3)}, minmax(320px,1fr))`; grid.style.gap='16px';
+          sysList.forEach(([sys,text])=>{
+            const card=document.createElement('div'); card.className='card'; card.innerHTML=`<div class="sys">${sys}</div><div class="ans"></div>`;
+            grid.appendChild(card); populateSentences(card.querySelector('.ans'), text); addPMIDsSection(card, item, sys);
+          });
+          answersWrap.appendChild(grid);
+        }
+
+        wrap.appendChild(answersWrap); resultsDiv.appendChild(wrap);
+      });
+    }
+
+    async function doSearch(){
+      const selected = selectedSystems();
+      const q = qInput.value.trim();
+
+      if (!selected.length){
+        metaDiv.textContent = '0 result(s) • no systems selected';
+        resultsDiv.innerHTML = `<div class="panel"><div class="muted">Select at least one system (System A–E) to load results.</div></div>`;
+        return;
+      }
+
+      resultsDiv.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="muted">Loading answers…</div></div>`;
+      const url = `/api/search?q=${encodeURIComponent(q)}&systems=${encodeURIComponent(selected.join(","))}`;
+      const r = await fetch(url); const data = await r.json();
+      renderResults(data);
+    }
+
+    qInput.addEventListener("input", ()=>{ clearTimeout(window.__q_timer); window.__q_timer = setTimeout(doSearch, 120); });
+
+    (async function init(){
+      await fetchSystems();
+      // initial empty state (no systems selected)
+      metaDiv.textContent = '0 result(s) • no systems selected';
+      resultsDiv.innerHTML = `<div class="panel"><div class="muted">Select at least one system (System A–E) to load results.</div></div>`;
+
+      const t = document.getElementById('autoCiteToggle');
+      if (t){
+        const saved = localStorage.getItem('autoCite') === 'true';
+        t.checked = saved; autoCite = saved;
+        t.addEventListener('change', ()=>{ autoCite = t.checked; localStorage.setItem('autoCite', String(autoCite)); if (selectedSystems().length) doSearch(); });
+      }
+    })();
   </script>
 </body>
 </html>
