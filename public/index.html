@@ -6,22 +6,42 @@
   <title>TREC BioGen 2025 — Task B</title>
   <style>
     :root{
+      /* dark theme (default) */
       --bg:#0d0f1a; --bg2:#10142a; --card:#141a33; --text:#e8ecff; --muted:#a7b4dd;
-      --accent:#7c3aed; --accent-weak:#32215a;
+      --accent:#7c3aed; --accent-weak:#32215a; --border:#1f284c; --border-2:#2a3560;
     }
+    body.light{
+      /* light theme */
+      --bg:#f6f7fb; --bg2:#ffffff; --card:#ffffff; --text:#0e1330; --muted:#49547a;
+      --accent:#6b46c1; --accent-weak:#efe9ff; --border:#dfe4f5; --border-2:#cfd7f0;
+    }
+
     *{box-sizing:border-box}
-    body{ margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial; color:var(--text); background:#0d0f1a; }
-    header{position:sticky;top:0;z-index:10;padding:20px 24px;border-bottom:1px solid #1e2746;background:rgba(13,15,26,.7);backdrop-filter:blur(6px);
-      transition:transform .35s ease, opacity .35s ease}
-    .header--hidden{ transform:translateY(-100%); opacity:0; pointer-events:none }
-    h1{margin:0;font-size:22px}
+    body{
+      margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
+      color:var(--text); background:var(--bg);
+    }
+
+    header{
+      position:sticky;top:0;z-index:10;padding:12px 24px;border-bottom:1px solid var(--border);
+      background:color-mix(in oklab, var(--bg) 85%, transparent); backdrop-filter:blur(6px);
+      transition:transform .35s ease, opacity .35s ease;
+    }
+    .header--hidden{ transform: translateY(-100%); opacity: 0; pointer-events: none; }
+    h1{margin:0;font-size:20px}
     .nav{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted)}
-    .nav a{color:#cdb8ff;text-decoration:none}
+    .nav a{color:color-mix(in oklab, var(--accent) 70%, #cdb8ff);text-decoration:none}
     .nav a:hover{text-decoration:underline}
+    .themeBtn{
+      margin-left:6px;border-radius:999px;border:1px solid var(--border-2); background:var(--bg2); color:var(--text);
+      padding:6px 10px; cursor:pointer; font-size:13px;
+    }
 
     .container{max-width:1100px;margin:0 auto;padding:16px 24px 24px}
 
-    #landing{ position:relative;height:72vh;display:flex;align-items:center;justify-content:center;overflow:hidden }
+    #landing{
+      position:relative;height:72vh;display:flex;align-items:center;justify-content:center;overflow:hidden
+    }
     #anim{
       position:absolute;inset:0;background:
         radial-gradient(40% 60% at 20% 10%, #1b1f46 0%, transparent 60%),
@@ -30,44 +50,62 @@
         radial-gradient(20% 30% at 10% 80%, #2c114b 0%, transparent 60%);
       filter:blur(30px);animation:float 16s ease-in-out infinite alternate
     }
-    @keyframes float{to{transform:translateY(-20px) scale(1.02)}}
-    .hero{position:relative;text-align:center}
+    @keyframes float{to{transform:translateY(-18px) scale(1.02)}}
+    #bgLines{ position:absolute; inset:0; z-index:0; opacity:.5; }
+    .hero{position:relative;text-align:center;z-index:1}
     .hero h2{font-size:40px;margin:0 0 8px}
     .hero p{color:var(--muted);margin:0 0 18px}
-    .hero .cta{ font-size:16px;padding:10px 16px;border-radius:12px;border:1px solid #2a3560;background:linear-gradient(90deg,#2b1e52,#291e68);color:#fff;cursor:pointer }
-    .hero .cta:hover{box-shadow:0 0 0 3px rgba(124,58,237,.25)}
+    .hero .cta{
+      font-size:16px;padding:10px 16px;border-radius:12px;border:1px solid var(--border-2);
+      background:linear-gradient(90deg,#2b1e52,#291e68);color:#fff;cursor:pointer
+    }
+    body.light .hero .cta{ background:linear-gradient(90deg,#efe9ff,#e3ddff); color:#2a2260; }
+    .hero .cta:hover{box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent)}
 
-    .panel{background:var(--card);border:1px solid #1f284c;border-radius:16px;padding:20px;margin-bottom:18px}
+    .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px}
     .row{display:flex;gap:12px;flex-wrap:wrap}
     .grow{flex:1}
-    input[type="text"]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #2a3560;background:#0f1430;color:var(--text)}
-    input[type="text"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.25)}
+    input[type="text"]{
+      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border-2);background:var(--bg2);color:var(--text)
+    }
+    input[type="text"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent)}
     .systems{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid #2a3560;background:#0f1430;cursor:pointer}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid var(--border-2);background:var(--bg2);cursor:pointer}
     .chip input{accent-color:var(--accent)}
     .muted{color:var(--muted);font-size:13px}
 
-    .result{border-top:1px solid #202a52;padding-top:16px;margin-top:16px}
+    .result{border-top:1px solid color-mix(in oklab, var(--border) 90%, transparent);padding-top:16px;margin-top:16px}
     .qid{font-weight:700;font-size:12px;color:var(--muted)}
     .qt{font-size:18px;font-weight:800;margin:6px 0 4px}
     .topic{font-size:13px;color:var(--muted)}
-    details{margin-top:8px} summary{cursor:pointer;color:var(--muted)}
+
+    details{margin-top:8px}
+    details summary{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:10px;
+      background:var(--bg2); border:1px solid var(--border-2); color:var(--text);
+      cursor:pointer;
+    }
+    details[open] summary{ background:color-mix(in oklab, var(--accent) 12%, var(--bg2)); border-color:var(--accent); }
+    details summary:hover{ border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent); }
 
     .answers{margin-top:14px}
-    .card{background:#101739;border:1px solid #23306a;border-radius:12px;padding:14px}
+    .card{background:color-mix(in oklab, var(--card) 90%, var(--bg2));border:1px solid #23306a;border-color:var(--border);border-radius:12px;padding:14px}
     .sys{font-weight:800;margin-bottom:10px;font-size:13px}
 
     .ans{line-height:1.65}
-    .srow{margin:10px 0;padding:10px 12px;background:#0f1430;border:1px solid #2a3560;border-radius:10px}
-    .srow .bullet{display:inline-block;width:8px;height:8px;border-radius:50%;background:#7c3aed;margin-right:8px;transform:translateY(-1px)}
+    .srow{margin:10px 0;padding:10px 12px;background:var(--bg2);border:1px solid var(--border-2);border-radius:10px}
+    .srow .bullet{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px;transform:translateY(-1px)}
     .srow .text{display:inline}
     .srow .actions{display:inline-flex;gap:8px;margin-left:8px}
-    .btn{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid #2a3560;background:var(--bg2);color:var(--text);cursor:pointer}
-    .btn:hover{background:var(--accent-weak);border-color:var(--accent)}
+    .btn{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--border-2);background:var(--bg2);color:var(--text);cursor:pointer}
+    .btn:hover{background:var(--accent-weak);border-color:var(--accent); color:#fff}
+    body.light .btn:hover{ color:#fff }
 
     .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-    .tab{padding:6px 10px;border-radius:10px;border:1px solid #2a3560;background:#0f1430;cursor:pointer}
-    .tab.active{background:#271a51;border-color:#7c3aed}
+    .tab{padding:6px 10px;border-radius:10px;border:1px solid var(--border-2);background:var(--bg2);cursor:pointer;transition:background .15s,border-color .15s}
+    .tab.active{background:color-mix(in oklab, var(--accent) 15%, var(--bg2));border-color:var(--accent)}
+    .tab:hover{ border-color:var(--accent); }
     .tabcontent{display:none}
     .tabcontent.active{display:block}
 
@@ -76,10 +114,11 @@
     @keyframes spin{to{transform:rotate(360deg)}}
 
     .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
-    .select{border:1px solid #2a3560;background:#0f1430;color:var(--text);border-radius:8px;padding:6px 8px}
+    .select{border:1px solid var(--border-2);background:var(--bg2);color:var(--text);border-radius:8px;padding:6px 8px}
 
-    .footer{text-align:center;color:var(--muted);padding:26px 24px;font-size:13px}
-    .footer a{color:#cdb8ff}
+    .footer{ text-align:center;color:var(--muted);padding:26px 24px;font-size:13px;border-top:1px solid var(--border) }
+    .footer a{ color:color-mix(in oklab, var(--accent) 70%, #cdb8ff); text-decoration:none }
+    .footer a:hover{text-decoration:underline}
   </style>
 </head>
 <body>
@@ -92,6 +131,7 @@
         <a href="#task" id="navTask">Task</a>
         <a href="https://github.com/cbsag/trec-biogen-taskb-viewer" target="_blank" rel="noopener">GitHub</a>
         <a href="https://www.linkedin.com/in/your-link" target="_blank" rel="noopener">LinkedIn</a>
+        <button id="themeToggle" class="themeBtn" title="Toggle light/dark">🌙</button>
       </div>
     </div>
   </header>
@@ -99,6 +139,7 @@
   <!-- landing: 2-step -->
   <section id="landing">
     <div id="anim"></div>
+    <canvas id="bgLines"></canvas>
 
     <!-- slide 1 -->
     <div class="hero" id="hero1">
@@ -118,11 +159,26 @@
   <!-- task description -->
   <section id="task" class="container" style="display:none">
     <div class="panel">
-      <h3 style="margin:0 0 8px">Task description</h3>
-      <div class="muted">
-        This viewer loads the official 30 topics for TREC BioGen 2025 Task B and shows answers from multiple systems.
-        Select one or more systems to compare; expand “Cited PMIDs” to view paper titles and abstracts via PubMed (EFetch).
-        Use the view control to switch Tabs/Columns for multi-system reading.
+      <h3 style="margin:0 0 8px">TREC 2025 Biomedical Generative Retrieval (BioGen)</h3>
+      <div class="muted" style="line-height:1.7">
+        <p><strong>Goal.</strong> Reduce hallucinations in biomedical QA by grounding answers with PubMed citations.</p>
+        <ul>
+          <li><strong>Task A — Grounding:</strong> For each answer sentence, provide up to <em>3</em> new supporting PMIDs and up to <em>3</em> contradicting PMIDs (existing supporting PMIDs are given).</li>
+          <li><strong>Task B — Reference Attribution:</strong> Generate an answer ≤250 words; include up to <em>3</em> PMIDs per sentence from the official PubMed corpus.</li>
+        </ul>
+        <p><strong>Timeline.</strong> Dataset &amp; baseline: June&nbsp;2&nbsp;2025 · Submissions: Aug&nbsp;15 · Results: late Sep · Notebook: late Oct · TREC: Nov&nbsp;17–21.</p>
+        <p><strong>Submission format (Task B excerpt).</strong></p>
+<pre style="white-space:pre-wrap;background:var(--bg2);border:1px solid var(--border-2);border-radius:10px;padding:10px;margin:8px 0">
+{
+  "metadata": { "team_id": "...", "run_id": "...", "topic_id": "..." },
+  "responses": [
+    { "text": "Sentence 1.", "citations": ["PMID1","PMID2","PMID3"] },
+    { "text": "Sentence 2.", "citations": ["PMID4","PMID5"] }
+  ]
+}
+</pre>
+        <p><strong>PubMed E-utilities etiquette.</strong> Include <code>tool</code> and <code>email</code>; max ~3 rps (10 rps with API key). This app uses <code>ESearch/ESummary</code> for sentence hints (optional) and <code>EFetch</code> to show titles/abstracts for cited PMIDs.</p>
+        <p><a href="https://trec-biogen.github.io/docs/#task-description" target="_blank" rel="noopener">Official task description ↗</a></p>
       </div>
     </div>
   </section>
@@ -159,17 +215,55 @@
     </div>
   </div>
 
+  <div class="footer">
+    ~ cbsag ·
+    <a href="https://github.com/cbsag" target="_blank" rel="noopener">GitHub</a> ·
+    <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+
   <script>
+    /* ---------- THEME (light/dark) ---------- */
+    const themeBtn = document.getElementById('themeToggle');
+    function applyTheme(t){ document.body.classList.toggle('light', t==='light'); themeBtn.textContent = t==='light' ? '☀️' : '🌙'; localStorage.setItem('biogen_theme', t); }
+    const savedTheme = localStorage.getItem('biogen_theme') || 'dark'; applyTheme(savedTheme);
+    themeBtn.addEventListener('click', ()=>{ applyTheme(document.body.classList.contains('light') ? 'dark' : 'light'); });
+
+    /* ---------- moving lines background ---------- */
+    (function linesBG(){
+      const cvs = document.getElementById('bgLines'); if(!cvs) return;
+      const ctx = cvs.getContext('2d',{alpha:true});
+      let w=0,h=0, t=0, raf;
+      function size(){ const r = window.devicePixelRatio||1; w=cvs.clientWidth; h=cvs.clientHeight; cvs.width=w*r; cvs.height=h*r; ctx.setTransform(r,0,0,r,0,0); }
+      function draw(){
+        ctx.clearRect(0,0,w,h);
+        const cols = 8, spacing = w/(cols+1);
+        for(let i=0;i<=cols;i++){
+          const x = i*spacing + Math.sin((t/700)+(i*0.6))*15;
+          ctx.lineWidth = 1.2;
+          const g = ctx.createLinearGradient(x,0,x,h);
+          g.addColorStop(0,'#6d5bd0'); g.addColorStop(.5,'#7c3aed'); g.addColorStop(1,'#3f2a99');
+          ctx.strokeStyle = g;
+          ctx.beginPath();
+          for(let y=0;y<=h;y+=12){
+            const off = Math.sin((y*0.02)+(i*0.8)+(t/900))*10;
+            ctx.lineTo(x+off, y);
+          }
+          ctx.stroke();
+        }
+        t = performance.now();
+        raf = requestAnimationFrame(draw);
+      }
+      const ro = new ResizeObserver(size); ro.observe(cvs);
+      size(); draw();
+      window.addEventListener('visibilitychange', ()=>{ if(document.hidden){ cancelAnimationFrame(raf); } else { t=performance.now(); draw(); }});
+    })();
+
+    /* ---------- elements ---------- */
     const systemsDiv = document.getElementById("systems");
     const resultsDiv = document.getElementById("results");
     const metaDiv = document.getElementById("meta");
     const qInput = document.getElementById("q");
 
-    let allSystems = [];
-    let sysDescriptions = {};
-    let autoCite = false;
-
-    // landing / header controls
     const landing = document.getElementById('landing');
     const viewer  = document.getElementById('viewer');
     const taskSec = document.getElementById('task');
@@ -183,6 +277,7 @@
     const textSizeSel = document.getElementById('textSize');
     const viewModeSel = document.getElementById('viewMode');
 
+    /* ---------- landing / header visibility ---------- */
     function goHero2(){ hero1.style.display='none'; hero2.style.display='block'; headerEl.classList.remove('header--hidden'); }
     function showViewer(){ landing.style.display='none'; taskSec.style.display='none'; viewer.style.display='block'; headerEl.classList.remove('header--hidden'); qInput.focus(); }
     function showLanding(){ viewer.style.display='none'; taskSec.style.display='none'; landing.style.display='flex'; headerEl.classList.add('header--hidden'); hero2.style.display='none'; hero1.style.display='block'; }
@@ -193,19 +288,29 @@
     navHome.addEventListener('click', (e)=>{ e.preventDefault(); showLanding(); });
     navTask.addEventListener('click', (e)=>{ e.preventDefault(); showTask(); });
 
-    // reveal header on interaction from landing
-    let revealed=false;
+    let revealed=false; // reveal header on any interaction
     function reveal(){ if(revealed) return; revealed=true; goHero2(); }
     window.addEventListener('wheel', reveal, {passive:true});
     window.addEventListener('touchmove', reveal, {passive:true});
-    window.addEventListener('keydown', (e)=>{ if(['ArrowDown','PageDown',' '].includes(e.key)) reveal(); if(e.key==='/'){ showViewer(); qInput.focus(); e.preventDefault(); }});
+    window.addEventListener('keydown', (e)=>{
+      if(['ArrowDown','PageDown',' '].includes(e.key)) reveal();
+      if(e.key==='/'){ showViewer(); qInput.focus(); e.preventDefault(); }
+    });
 
     textSizeSel.addEventListener('change', ()=>{ document.querySelectorAll('.ans').forEach(a => a.style.lineHeight = textSizeSel.value); });
+    viewModeSel.addEventListener('change', ()=>{ if (selectedSystems().length) doSearch(); });
 
+    /* ---------- state ---------- */
+    let allSystems = [];
+    let sysDescriptions = {};
+    let autoCite = false;
+    const AUTO_CITE_PER_ANSWER_LIMIT = 3;
+    const AUTO_CITE_RETMAX = 3;
+
+    /* ---------- systems ---------- */
     function selectedSystems(){
       return Array.from(document.querySelectorAll('.chip input[type="checkbox"]:checked')).map(cb => cb.value);
     }
-
     function renderSystems(){
       systemsDiv.innerHTML = "";
       allSystems.forEach(sys => {
@@ -221,7 +326,6 @@
         chip.querySelector("input").addEventListener("change", doSearch);
       });
     }
-
     async function fetchSystems(){
       const r = await fetch("/api/systems");
       const data = await r.json();
@@ -230,12 +334,12 @@
       renderSystems();
     }
 
-    // bullet-friendly splitter
+    /* ---------- sentence split (bullet-friendly) ---------- */
     function splitSentences(text){
       if (!text) return [];
       const normalized = String(text)
         .replace(/\r\n/g, '\n')
-        .replace(/[•●▪■]+/g, '\n')
+        .replace(/[•●▪■]+/g, '\n')   // bullets → new lines
         .replace(/\u2022/g, '\n')
         .replace(/\s+\n/g, '\n')
         .trim();
@@ -248,11 +352,8 @@
       return out;
     }
 
-    // sentence→PubMed (optional quick cites)
-    const RATE_MS = 150;
-    let _citeQ = Promise.resolve();
-    const _citeCache = new Map();
-
+    /* ---------- PubMed: sentence search (optional) ---------- */
+    const RATE_MS = 150; let _citeQ = Promise.resolve(); const _citeCache = new Map();
     async function fetchCites(sentence, retmax=3){
       const key = `${sentence}::${retmax}`;
       if (_citeCache.has(key)) return _citeCache.get(key);
@@ -263,7 +364,6 @@
       _citeCache.set(key, data);
       return data;
     }
-
     function renderCitations(container, sentence, retmax=3){
       container.innerHTML = '<span class="muted">searching…</span>';
       fetchCites(sentence, retmax).then(data=>{
@@ -282,7 +382,7 @@
       }).catch(err=>{ container.innerHTML = `<span class="muted">error: ${String(err.message||err)}</span>`; });
     }
 
-    // PMIDs → title/abstract
+    /* ---------- PubMed: EFetch details for cited PMIDs ---------- */
     async function fetchPMIDsDetails(pmids){
       const key = pmids.join(",");
       if (!window.__pmidCache) window.__pmidCache = new Map();
@@ -315,7 +415,6 @@
         container.innerHTML=''; container.appendChild(ul);
       }).catch(err=>{ container.innerHTML = `<span class="muted">error: ${String(err.message||err)}</span>`; });
     }
-
     function addPMIDsSection(card, item, sys){
       const pmids = (item.pmids && item.pmids[sys]) || [];
       if (!pmids.length) return;
@@ -325,6 +424,7 @@
       card.appendChild(btn); card.appendChild(slot);
     }
 
+    /* ---------- render answers ---------- */
     function populateSentences(ansDiv, text){
       ansDiv.style.lineHeight = textSizeSel.value;
       if (!text){ ansDiv.innerHTML="<span class='muted'>— no answer —</span>"; return; }
@@ -336,11 +436,11 @@
         const actions=document.createElement('span'); actions.className='actions';
         const btn=document.createElement('button'); btn.className='btn'; btn.textContent='Find PubMed cites';
         const slot=document.createElement('div'); slot.className='muted'; slot.style.marginTop='6px';
-        btn.addEventListener('click', ()=>renderCitations(slot, s, 3));
+        btn.addEventListener('click', ()=>renderCitations(slot, s, AUTO_CITE_RETMAX));
         actions.appendChild(btn);
         row.appendChild(dot); row.appendChild(span); row.appendChild(actions); row.appendChild(slot);
         ansDiv.appendChild(row);
-        if (autoCite && idx < 3) renderCitations(slot, s, 3);
+        if (autoCite && idx < AUTO_CITE_PER_ANSWER_LIMIT) renderCitations(slot, s, AUTO_CITE_RETMAX);
       });
     }
 
@@ -392,7 +492,10 @@
         } else {
           const grid=document.createElement('div'); grid.style.display='grid'; grid.style.gridTemplateColumns=`repeat(${Math.min(sysList.length,3)}, minmax(320px,1fr))`; grid.style.gap='16px';
           sysList.forEach(([sys,text])=>{
-            const card=document.createElement('div'); card.className='card'; card.innerHTML=`<div class="sys">${sys}</div><div class="ans"></div>`;
+            const card=document.createElement('div'); card.className='card';
+            card.style.boxShadow='0 0 0 1px color-mix(in oklab, var(--border) 80%, transparent) inset';
+            card.style.background='color-mix(in oklab, var(--bg2) 95%, var(--card))';
+            card.innerHTML=`<div class="sys">${sys}</div><div class="ans"></div>`;
             grid.appendChild(card); populateSentences(card.querySelector('.ans'), text); addPMIDsSection(card, item, sys);
           });
           answersWrap.appendChild(grid);
@@ -402,6 +505,7 @@
       });
     }
 
+    /* ---------- query/search ---------- */
     async function doSearch(){
       const selected = selectedSystems();
       const q = qInput.value.trim();
@@ -420,6 +524,7 @@
 
     qInput.addEventListener("input", ()=>{ clearTimeout(window.__q_timer); window.__q_timer = setTimeout(doSearch, 120); });
 
+    /* ---------- boot ---------- */
     (async function init(){
       await fetchSystems();
       // initial empty state (no systems selected)
