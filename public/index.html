@@ -13,37 +13,18 @@
       --shadow: 0 10px 30px rgba(0,0,0,.25);
       --link:#eadcff; --link-hover:#ffffff;
     }
-    /* [data-theme="light"]{
-      --bg:#f6f7fb; --bg2:#f2f3f9; --card:#ffffff; --text:#1c2340; --muted:#5a6a99;
-      --line:#e6e9f3; --line2:#dfe4f3; --accent:#6d28d9; --accent-weak:#efe9ff;
-      --chip:#ffffff; --chip-bd:#e6e9f3; --pill:#ffffff; --pill-bd:#e6e9f3;
-      --shadow: 0 8px 20px rgba(2,6,23,.08);
-      --link:#4b2bb8; --link-hover:#2a167a;
-    } */
-     [data-theme="light"]{
-      /* Softer, tinted light palette */
+    [data-theme="light"]{
+      /* Softer, tinted light palette (less white) */
       --bg:#edf0f7;        /* page background */
       --bg2:#e9ecf5;       /* controls / inputs bg */
-      --card:#f3f5fb;      /* panels/cards (no pure white) */
-      --text:#1c2340;
-      --muted:#5a6a99;
-
-      --line:#d7dced;      /* borders */
-      --line2:#cfd6ea;
-
-      --accent:#6d28d9;
-      --accent-weak:#e9e2ff;
-
-      --chip:#f3f5fb;      /* chips/pills match card tone */
-      --chip-bd:#d7dced;
-      --pill:#f3f5fb;
-      --pill-bd:#d7dced;
-
+      --card:#f3f5fb;      /* panels/cards */
+      --text:#1c2340; --muted:#5a6a99;
+      --line:#d7dced; --line2:#cfd6ea;
+      --accent:#6d28d9; --accent-weak:#e9e2ff;
+      --chip:#f3f5fb; --chip-bd:#d7dced;
+      --pill:#f3f5fb; --pill-bd:#d7dced;
       --shadow: 0 8px 18px rgba(20,30,60,.08);
-
-      /* link contrast in light */
-      --link:#4b2bb8;
-      --link-hover:#2a167a;
+      --link:#4b2bb8; --link-hover:#2a167a;
     }
     [data-theme="light"] .bgfx::before{ opacity:.75; }
     [data-theme="light"] .bgfx .wavy{ opacity:.45; }
@@ -54,27 +35,7 @@
       margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
       color:var(--text); background:var(--bg);
     }
-    [data-theme="light"] .nav a.active{
-      background: #ece6ff;        /* soft purple chip */
-      border-color: #6d28d9;      /* accent border */
-      color: #2a167a;             /* readable text */
-      box-shadow: 0 0 0 3px rgba(109,40,217,.12) inset;
-      font-weight: 600;
-    }
 
-    /* Hover state in light mode (keeps contrast) */
-    [data-theme="light"] .nav a:hover{
-      background:#f2edff;
-      border-color:#a88df2;
-      color:#2a167a;
-    }
-
-    /* Keyboard focus ring (both themes) */
-    .nav a:focus-visible{
-      outline:2px solid var(--accent);
-      outline-offset:2px;
-      border-radius:10px;
-    }
     /* ---------- GLOBAL BACKGROUND ANIMATION (all pages) ---------- */
     .bgfx{position:fixed; inset:0; z-index:-2; overflow:hidden}
     .bgfx::before{
@@ -110,13 +71,20 @@
       position:sticky; top:0; z-index:10; border-bottom:1px solid var(--line);
       background:rgba(11,14,22,.65); backdrop-filter:blur(6px); transition:opacity .25s;
     }
-
     [data-theme="light"] header{background:rgba(255,255,255,.7)}
     header.hidden{opacity:0; pointer-events:none}
     .nav{max-width:1100px;margin:0 auto;padding:14px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
     .nav h1{margin:0;font-size:18px;font-weight:700}
     .nav a{color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:10px}
     .nav a.active{color:var(--text); background:var(--pill); border:1px solid var(--pill-bd)}
+    [data-theme="light"] .nav a.active{
+      background:#ece6ff; border-color:#6d28d9; color:#2a167a;
+      box-shadow:0 0 0 3px rgba(109,40,217,.12) inset; font-weight:600;
+    }
+    [data-theme="light"] .nav a:hover{
+      background:#f2edff; border-color:#a88df2; color:#2a167a;
+    }
+    .nav a:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:10px}
     .spacer{flex:1}
     .toggle{cursor:pointer;border:1px solid var(--line2);background:var(--chip);padding:6px 9px;border-radius:999px}
 
@@ -203,6 +171,28 @@
       border:1px solid var(--line2); background:var(--bg2); font-size:12px; color:var(--muted)
     }
 
+    /* ---------- TEAM ---------- */
+    .team-grid{
+      display:grid; gap:16px;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    }
+    .member{background:var(--card); border:1px solid var(--line2); border-radius:16px; padding:16px; box-shadow:var(--shadow)}
+    .member-head{display:flex; gap:12px; align-items:center; margin-bottom:8px}
+    .avatar{
+      width:44px;height:44px;border-radius:50%;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg, rgba(124,58,237,.35), rgba(124,58,237,.15));
+      color:#fff; font-weight:800; letter-spacing:.5px;
+      border:1px solid var(--line2)
+    }
+    .m-name{font-weight:800}
+    .m-role{font-size:12px;color:var(--muted)}
+    .m-actions{margin-top:8px}
+    .icon-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line2);
+      background:var(--bg2);border-radius:999px;text-decoration:none;color:var(--text);font-size:13px}
+    .icon-btn:hover{background:var(--accent-weak);border-color:var(--accent)}
+    .icon{width:14px;height:14px;display:inline-block}
+
     .hide{display:none !important;}
   </style>
 </head>
@@ -216,6 +206,7 @@
       <a href="/" id="navHome">Home</a>
       <a href="/task" id="navTask">Task</a>
       <a href="/viewer" id="navViewer">Viewer</a>
+      <a href="/team" id="navTeam">Team</a>
       <span class="spacer"></span>
       <a href="https://github.com/cbsag" target="_blank" rel="noopener">GitHub</a>
       <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a>
@@ -327,6 +318,15 @@
     </div>
   </section>
 
+  <!-- TEAM -->
+  <section id="team" class="container hide">
+    <div class="panel">
+      <h3 style="margin:0">Team</h3>
+      <p class="muted" style="margin:6px 0 14px">People who helped build this viewer.</p>
+      <div id="teamGrid" class="team-grid"></div>
+    </div>
+  </section>
+
   <div class="footer">~ cbsag · <a href="https://github.com/cbsag" target="_blank" rel="noopener">GitHub</a> ·
     <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a></div>
 
@@ -345,6 +345,7 @@
     const navHome = document.getElementById('navHome');
     const navViewer = document.getElementById('navViewer');
     const navTask = document.getElementById('navTask');
+    const navTeam = document.getElementById('navTeam');
     const openViewerBtn = document.getElementById('openViewerBtn');
     const heroTitle = document.getElementById('heroTitle');
     const themeToggle = document.getElementById('themeToggle');
@@ -362,26 +363,29 @@
       });
     })();
 
-    /* ====== ROUTER (paths: /, /task, /viewer) ====== */
+    /* ====== ROUTER (paths: /, /task, /viewer, /team) ====== */
     function routeFromLocation(){
       const p = location.pathname.replace(/\/+$/,'').toLowerCase();
       if (p === '' || p === '/') return '#home';
       if (p.endsWith('/task')) return '#task';
       if (p.endsWith('/viewer')) return '#viewer';
+      if (p.endsWith('/team')) return '#team';
       // fallback to hash (if someone keeps old links)
       const h = (location.hash||'').toLowerCase();
-      if (h === '#task' || h === '#viewer') return h;
+      if (h === '#task' || h === '#viewer' || h === '#team') return h;
       return '#home';
     }
     function setActiveNav(route){
       navHome.classList.toggle('active', route==='#home');
       navTask.classList.toggle('active', route==='#task');
       navViewer.classList.toggle('active', route==='#viewer');
+      navTeam.classList.toggle('active', route==='#team');
     }
     function showSection(route){
       document.getElementById('landing').classList.toggle('hide', route!=='#home');
       document.getElementById('task').classList.toggle('hide', route!=='#task');
       document.getElementById('viewer').classList.toggle('hide', route!=='#viewer');
+      document.getElementById('team').classList.toggle('hide', route!=='#team');
       setActiveNav(route);
       header.classList.toggle('hidden', route==='#home' && !window.__interacted);
       window.scrollTo(0, 0);
@@ -394,7 +398,7 @@
     window.addEventListener('popstate', renderRoute);
 
     // Intercept nav clicks so we SPA without reloads
-    [navHome, navTask, navViewer].forEach(a=>{
+    [navHome, navTask, navViewer, navTeam].forEach(a=>{
       a.addEventListener('click', (e)=>{
         e.preventDefault();
         window.__interacted = true;
@@ -458,7 +462,7 @@
     /* ====== VIEWER: Search ====== */
     function splitSentences(text) {
       if (!text) return [];
-      const parts = text.replace(/\s+/g, ' ').split(/(?<=[\.!?])\s+(?=[A-Z0-9])/g);
+      const parts = String(text).replace(/\s+/g, ' ').split(/(?<=[\.!?])\s+(?=[A-Z0-9])/g);
       return parts.filter(s => s && s.trim());
     }
 
@@ -562,16 +566,26 @@
 
         const answersWrap = document.createElement("div"); answersWrap.className = "answers";
 
-        // systems that have non-empty answers
-        const sysList = Object.entries(item.answers)
-            .filter(([_, obj]) => obj && (obj.text || (obj.sentences && obj.sentences.length)));
+        // systems that have non-empty answers (support both strings and objects)
+        const sysList = Object.entries(item.answers).filter(([_, obj]) => {
+          if (!obj) return false;
+          if (typeof obj === 'string') return obj.trim().length > 0;
+          return (obj.text && String(obj.text).trim()) ||
+                 (Array.isArray(obj.sentences) && obj.sentences.length);
+        });
+
         const multi = sysList.length > 1;
         const mode = (viewModeSel.value === 'auto') ? (multi ? 'tabs' : 'single') : viewModeSel.value;
 
         function populateCard(cardBody, ansObj, sysName){
-          const sents = ansObj.sentences && ansObj.sentences.length
-            ? ansObj.sentences.map(x => ({t:x.text, pmids:x.pmids||[]}))
-            : splitSentences(ansObj.text).map(t => ({t, pmids:[]}));
+          let sents = [];
+          if (ansObj && typeof ansObj === 'object' && (ansObj.sentences?.length || ansObj.text)){
+            sents = ansObj.sentences && ansObj.sentences.length
+              ? ansObj.sentences.map(x => ({t:x.text, pmids:x.pmids||[]}))
+              : splitSentences(ansObj.text).map(t => ({t, pmids:[]}));
+          } else {
+            sents = splitSentences(ansObj).map(t => ({t, pmids:[]}));
+          }
 
           cardBody.style.lineHeight = textSizeSel.value;
           sents.forEach(({t, pmids})=>{
@@ -597,7 +611,8 @@
             cardBody.appendChild(row);
           });
 
-          if (ansObj.pmids_all && ansObj.pmids_all.length) {
+          // bottom: union PMIDs for the whole answer (if present)
+          if (ansObj && typeof ansObj === 'object' && ansObj.pmids_all && ansObj.pmids_all.length) {
             addPMIDsSection(cardBody.parentElement, ansObj.pmids_all);
           } else if (item.pmids && item.pmids[sysName] && item.pmids[sysName].length) {
             addPMIDsSection(cardBody.parentElement, item.pmids[sysName]);
@@ -605,7 +620,7 @@
         }
 
         if (!multi || mode === 'single') {
-          const [sys, ansObj] = sysList[0] || ["System", {text:""}];
+          const [sys, ansObj] = sysList[0] || ["System", ""];
           const card = document.createElement("div"); card.className = "card";
           card.innerHTML = `<div class="sys">${sys}</div><div class="ans"></div>`;
           answersWrap.appendChild(card);
@@ -649,10 +664,47 @@
       });
     }
 
+    /* ====== TEAM ====== */
+    const TEAM = [
+      // Add yourself or other collaborators here if you like
+      // { name: "Ganesh Chandrasekar", role: "Lead / App Dev", linkedin: "https://www.linkedin.com/in/cbsag" },
+      { name: "Benjamin Lofo", role: "Contributor", linkedin: "https://www.linkedin.com/in/lamungu/" },
+      { name: "Aleksandr Vinokhodov", role: "Contributor", linkedin: "https://www.linkedin.com/in/aleksandr-vinokhodov/" }
+    ];
+    function initials(n){
+      return n.split(/\s+/).filter(Boolean).map(x=>x[0].toUpperCase()).slice(0,2).join('');
+    }
+    function renderTeam(){
+      const grid = document.getElementById('teamGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      TEAM.forEach(m=>{
+        const card = document.createElement('div'); card.className='member';
+        card.innerHTML = `
+          <div class="member-head">
+            <div class="avatar">${initials(m.name)}</div>
+            <div>
+              <div class="m-name">${m.name}</div>
+              <div class="m-role">${m.role||''}</div>
+            </div>
+          </div>
+          <div class="m-actions">
+            <a class="icon-btn" href="${m.linkedin}" target="_blank" rel="noopener" aria-label="LinkedIn profile">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4V23h-4V8zm7.5 0h3.8v2.05h.05c.53-1 1.82-2.05 3.75-2.05 4.01 0 4.75 2.64 4.75 6.08V23h-4v-7.5c0-1.79-.03-4.09-2.5-4.09-2.5 0-2.88 1.95-2.88 3.96V23h-4V8z"/>
+              </svg>
+              LinkedIn
+            </a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
     /* ====== INIT ====== */
     (async function init(){
       await fetchSystems();
-      // Activate SPA routing & initial render
+      renderTeam();
       renderRoute();
     })();
   </script>
