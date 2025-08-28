@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,300 +7,309 @@
   <style>
     /* ---------- THEME ---------- */
     :root{
-      --bg:#0b0e16; --bg2:#0f1428; --card:#151c34; --text:#e8ecff; --muted:#a7b4dd;
-      --line:#212b4f; --line2:#273463; --accent:#7c3aed; --accent-weak:#2e2058;
-      --chip:#101739; --chip-bd:#2a3560; --pill:#211948; --pill-bd:#3c2d74;
-      --shadow: 0 10px 30px rgba(0,0,0,.25);
+      --bg:#0c0e17; --bg2:#0f1326; --panel:#121938; --card:#121938;
+      --text:#e8ecff; --muted:#a9b4d6; --border:#223161;
+      --accent:#7c3aed; --accent-2:#9f6bff; --accent-weak:#2c1f54;
+      --chip:#101733; --chip-border:#2a3560;
+      --link:#cbb7ff; --link-hover:#e3d8ff;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --badge:#2a3560;
     }
     [data-theme="light"]{
-      --bg:#f6f7fb; --bg2:#f2f3f9; --card:#ffffff; --text:#1c2340; --muted:#5a6a99;
-      --line:#e6e9f3; --line2:#dfe4f3; --accent:#6d28d9; --accent-weak:#efe9ff;
-      --chip:#ffffff; --chip-bd:#e6e9f3; --pill:#ffffff; --pill-bd:#e6e9f3;
-      --shadow: 0 8px 20px rgba(2,6,23,.08);
+      --bg:#f6f7fb; --bg2:#ffffff; --panel:#ffffff; --card:#ffffff;
+      --text:#0c1022; --muted:#4a5578; --border:#e3e6f1;
+      --accent:#6a38e0; --accent-2:#5127cf; --accent-weak:#efe8ff;
+      --chip:#f2f4ff; --chip-border:#dfe4ff;
+      --link:#432aa6; --link-hover:#2a1d7a;
+      --shadow:0 8px 20px rgba(12,16,34,.07);
+      --badge:#eef0fb;
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
-      color:var(--text); background:var(--bg);
+      background:var(--bg); color:var(--text);
     }
+    a{color:var(--link); text-decoration:underline}
+    a:hover{color:var(--link-hover)}
+    button{font:inherit}
 
-    /* ---------- GLOBAL BACKGROUND ANIMATION (both pages) ---------- */
-    .bgfx{position:fixed; inset:0; z-index:-2; overflow:hidden}
-    .bgfx::before{
-      content:""; position:absolute; inset:-20% -10% -10% -10%;
+    /* ---------- FIXED BACKGROUND ANIMATION (ALL PAGES) ---------- */
+    #bg{
+      position:fixed; inset:0; z-index:-1; overflow:hidden;
       background:
-        radial-gradient(40% 60% at 20% 20%, #1b2050 0%, transparent 60%),
-        radial-gradient(40% 50% at 80% 10%, #2a2160 0%, transparent 60%),
-        radial-gradient(30% 60% at 60% 90%, #171d48 0%, transparent 60%),
-        radial-gradient(20% 30% at 10% 85%, #2c114b 0%, transparent 60%);
-      filter:blur(38px); animation:float 16s ease-in-out infinite alternate;
-      opacity:.65;
+        radial-gradient(50% 60% at 15% 85%, rgba(124,58,237,.25) 0%, transparent 60%),
+        radial-gradient(60% 70% at 85% 10%, rgba(84,36,196,.25) 0%, transparent 60%),
+        radial-gradient(40% 50% at 60% 50%, rgba(33,29,85,.35) 0%, transparent 70%),
+        linear-gradient(180deg, rgba(255,255,255,.03), transparent 40%);
+      pointer-events:none;
     }
-    .bgfx .wavy{
-      position:absolute; inset:0; pointer-events:none;
-      background:
+    /* vertical “liquid” lines */
+    #bg::before, #bg::after{
+      content:""; position:absolute; inset:0; background:
         repeating-linear-gradient( to bottom,
-          transparent 0 14px, rgba(124,58,237,.04) 14px 28px),
-        radial-gradient(1200px 400px at -200px 50%, rgba(124,58,237,.11), transparent 70%),
-        radial-gradient(1200px 400px at 120% 40%, rgba(124,58,237,.11), transparent 70%);
-      -webkit-mask:
-        linear-gradient(90deg, transparent 0 6%, #000 6% 11%, transparent 11% 17%,
-                               #000 17% 22%, transparent 22% 28%, #000 28% 33%,
-                               transparent 33% 67%, #000 67% 72%, transparent 72% 78%,
-                               #000 78% 83%, transparent 83% 100%);
-      animation:drift 22s linear infinite;
-      opacity:.5;
+          transparent 0 14px,
+          rgba(124,58,237,.06) 14px 16px
+        );
+      animation:slide 18s linear infinite;
+      mask: radial-gradient(1200px 100% at 50% 50%, #000 70%, transparent 100%);
+      opacity:.4;
     }
-    @keyframes float{to{transform:translateY(-18px) scale(1.02)}}
-    @keyframes drift{to{background-position:0 260px, 0 0, 0 0}}
+    #bg::after{
+      animation-duration:28s; opacity:.25;
+      transform:scaleX(-1);
+    }
+    @keyframes slide { to { transform: translateY(-16px); } }
 
     /* ---------- HEADER ---------- */
-    header{
-      position:sticky; top:0; z-index:10; border-bottom:1px solid var(--line);
-      background:rgba(11,14,22,.65); backdrop-filter:blur(6px); transition:opacity .25s;
+    header{position:sticky; top:0; z-index:20; backdrop-filter:blur(8px);
+      background:color-mix(in oklab, var(--bg) 86%, transparent);
+      border-bottom:1px solid var(--border);
     }
-    [data-theme="light"] header{background:rgba(255,255,255,.7)}
-    header.hidden{opacity:0; pointer-events:none}
-    .nav{max-width:1100px;margin:0 auto;padding:14px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-    .nav h1{margin:0;font-size:18px;font-weight:700}
-    .nav a{color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:10px}
-    .nav a.active{color:var(--text); background:var(--pill); border:1px solid var(--pill-bd)}
+    .nav{max-width:1100px;margin:0 auto;display:flex;gap:14px;align-items:center;padding:14px 18px}
+    .brand{font-weight:700}
+    .nav a{color:var(--muted); text-decoration:none; padding:6px 10px; border-radius:8px}
+    .nav a:hover{background:color-mix(in oklab, var(--accent-weak) 18%, transparent)}
+    .nav a.active{background:var(--badge); color:var(--text)}
     .spacer{flex:1}
-    .toggle{cursor:pointer;border:1px solid var(--line2);background:var(--chip);padding:6px 9px;border-radius:999px}
+    .toggle{width:24px; height:24px; display:inline-grid; place-items:center;
+      border-radius:999px; border:1px solid var(--border); background:var(--panel); cursor:pointer}
+    .toggle:hover{box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 24%, transparent)}
 
-    /* ---------- CONTAINERS ---------- */
-    .container{max-width:1100px;margin:0 auto;padding:16px 24px 24px}
+    /* ---------- LAYOUT ---------- */
+    .container{max-width:1100px;margin:0 auto;padding:16px 18px 30px}
+    .panel{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:18px; box-shadow:var(--shadow)}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px}
+    .muted{color:var(--muted)}
+    .hidden{display:none!important}
 
-    /* ---------- LANDING ---------- */
-    #landing{min-height:72vh;display:flex;align-items:center;justify-content:center;position:relative}
-    .hero{position:relative;text-align:center; margin-top:8vh}
-    .hero h2{font-size:44px;margin:0 0 8px}
-    .hero p{color:var(--muted);margin:0 0 22px}
-    .cta{font-size:16px;padding:10px 16px;border-radius:12px;border:1px solid var(--line2);
-         background:linear-gradient(90deg,#2b1e52,#291e68);color:#fff;cursor:pointer}
-    [data-theme="light"] .cta{background:linear-gradient(90deg,#eae2ff,#efeaff); color:#41298d}
-    .cta:hover{box-shadow:0 0 0 3px rgba(124,58,237,.25)}
+    /* ---------- HERO (HOME) ---------- */
+    .hero{height:68vh; display:grid; place-items:center}
+    .hero .content{text-align:center}
+    .hero h1{font-size:40px; margin:0 0 10px}
+    .hero p{margin:0 0 18px; color:var(--muted)}
+    .btn{
+      background:linear-gradient(90deg, var(--accent) , var(--accent-2));
+      color:#fff; border:none; padding:10px 16px; border-radius:12px; cursor:pointer
+    }
+    .btn:hover{box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 24%, transparent)}
+    .footer{max-width:1100px;margin:0 auto;padding:28px 18px;color:var(--muted);font-size:13px;text-align:center}
+    .footer a{color:var(--link)}
 
-    .footer{text-align:center;color:var(--muted);padding:28px 24px;font-size:13px}
-    .footer a{color:var(--text);text-decoration:none}
+    /* ---------- TASK PAGE ---------- */
+    .task h2{margin:0 0 12px}
+    .task .grid{display:grid; gap:14px}
+    .badge{display:inline-block; padding:2px 8px; border-radius:999px; background:var(--badge); font-size:12px}
 
-    /* ---------- PANELS & FORMS ---------- */
-    .panel{background:var(--card);border:1px solid var(--line2);border-radius:16px;padding:18px;margin-bottom:18px; box-shadow:var(--shadow)}
-    .row{display:flex;gap:12px;flex-wrap:wrap}
-    .grow{flex:1}
-    input[type="text"]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--text)}
-    input[type="text"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.25); outline:none}
-    .btn{font-size:14px;padding:9px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--text);cursor:pointer}
-    .btn:hover{background:var(--accent-weak);border-color:var(--accent)}
-    .muted{color:var(--muted);font-size:13px}
+    /* ---------- VIEWER ---------- */
+    .toolbar{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .searchbar{position:relative; display:flex; gap:8px; width:100%}
+    .searchbar input[type="text"]{flex:1; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--bg2); color:var(--text)}
+    .searchbar button{padding:10px 14px; border-radius:12px; border:1px solid var(--border); background:var(--bg2); color:var(--text); cursor:pointer}
+    .filters{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .chip{display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border-radius:999px;
+      border:1px solid var(--chip-border); background:var(--chip); color:var(--text)}
+    .select{border:1px solid var(--border); background:var(--bg2); color:var(--text); border-radius:8px; padding:6px 8px}
 
-    .filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .filters .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid var(--chip-bd);background:var(--chip)}
-    .filters .chip input{accent-color:var(--accent)}
-    .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .select{border:1px solid var(--line2);background:var(--bg2);color:var(--text);border-radius:8px;padding:6px 8px}
-
-    /* ---------- RESULTS ---------- */
-    .result{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}
-    .qid{font-weight:700;font-size:12px;color:var(--muted)}
-    .qt{font-size:18px;font-weight:800;margin:6px 0 4px}
-    .topic{font-size:13px;color:var(--muted)}
-    details{margin-top:8px} summary{cursor:pointer;color:var(--muted)}
-    summary:hover{color:var(--text)}
+    .qid{font-weight:700; font-size:12px; color:var(--muted)}
+    .qt{font-size:18px; font-weight:800; margin:6px 0 4px}
+    .topic{font-size:13px; color:var(--muted)}
+    details{margin-top:8px} summary{cursor:pointer}
 
     .answers{margin-top:14px}
-    .card{background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:14px}
-    .sys{font-weight:800;margin-bottom:10px;font-size:13px}
-
+    .sys{font-weight:800; margin-bottom:10px; font-size:13px}
     .ans{line-height:1.65}
-    .srow{margin:10px 0;padding:10px 12px;background:var(--card);border:1px solid var(--line2);border-radius:10px}
-    .srow .bullet{display:inline-block;width:8px;height:8px;border-radius:50%;background:#7c3aed;margin-right:8px;transform:translateY(-1px)}
-    .srow .text{display:inline}
-    .srow .pmids{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
-    .pill{font-size:12px;border:1px solid var(--line2);background:var(--bg2);padding:3px 8px;border-radius:999px}
-    .srow .actions{display:inline-flex;gap:8px;margin-left:8px}
-    .link{color:#cdb8ff;text-decoration:none}
-    .link:hover{text-decoration:underline}
+    .srow{margin:10px 0; padding:10px 12px; background:var(--bg2); border:1px solid var(--border); border-radius:10px}
+    .srow .bullet{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent); margin-right:8px; transform:translateY(-1px)}
+    .pmids{display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 0}
+    .pmid{background:var(--badge); border:1px solid var(--border); border-radius:999px; padding:2px 8px; font-size:12px}
+    .pmid a{color:inherit; text-decoration:none}
+    .pmid a:hover{text-decoration:underline}
+    .sactions{display:inline-flex; gap:8px; margin-left:8px}
+    .smallbtn{font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:var(--bg2); color:var(--text); cursor:pointer}
+    .smallbtn:hover{background:color-mix(in oklab, var(--accent-weak) 24%, transparent)}
 
-    .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-    .tab{padding:6px 10px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);cursor:pointer}
-    .tab.active{background:var(--pill);border-color:var(--accent)}
+    .tabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px}
+    .tab{padding:6px 10px; border-radius:10px; border:1px solid var(--border); background:var(--bg2); cursor:pointer}
+    .tab.active{background:color-mix(in oklab, var(--accent-weak) 40%, transparent); border-color:var(--accent)}
     .tabcontent{display:none}
     .tabcontent.active{display:block}
 
-    .spinner-wrap{display:flex;gap:10px;align-items:center;justify-content:center;padding:24px}
-    .spinner{width:16px;height:16px;border-radius:50%;border:3px solid var(--line2);border-top-color:#b392ff;animation:spin .9s linear infinite}
+    .spinner-wrap{display:flex; gap:10px; align-items:center; justify-content:center; padding:24px}
+    .spinner{width:16px; height:16px; border-radius:50%; border:3px solid color-mix(in oklab, var(--border) 70%, transparent); border-top-color:var(--accent); animation:spin .9s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    .citation-list{margin:10px 0 0 0; padding:0}
-    .citation-card{list-style:none; margin:10px 0; padding:12px 12px; border:1px solid var(--line2);
-                   background:var(--card); border-radius:10px}
-    .citation-card summary{color:var(--muted)}
-    .absbox{margin-top:8px; padding:10px 12px; border-radius:10px; background:var(--bg2); border:1px solid var(--line2); white-space:pre-wrap}
+    .abstract{margin-top:8px; padding:12px; border-radius:10px; background:var(--bg2); border:1px solid var(--border); color:var(--muted); white-space:pre-wrap}
+    .result{border-top:1px solid var(--border); padding-top:16px; margin-top:16px}
 
-    .hide{display:none}
+    .subtle{background:var(--badge); border:1px solid var(--border)}
   </style>
 </head>
 <body>
-  <div class="bgfx"><div class="wavy"></div></div>
+  <div id="bg"></div>
 
-  <header id="siteHeader" class="hidden">
-    <nav class="nav">
-      <h1>TREC BioGen 2025 — Task B</h1>
-      <a href="#home" id="navHome">Home</a>
+  <header id="siteHeader">
+    <div class="nav">
+      <div class="brand">TREC BioGen 2025 — Task B</div>
+      <a href="#home" id="navHome" class="active">Home</a>
       <a href="#task" id="navTask">Task</a>
       <a href="#viewer" id="navViewer">Viewer</a>
-      <span class="spacer"></span>
+      <div class="spacer"></div>
       <a href="https://github.com/cbsag/trec-biogen-taskb-viewer" target="_blank" rel="noopener">GitHub</a>
       <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a>
-      <button class="toggle" id="themeToggle" title="Toggle light / dark">🌙</button>
-    </nav>
+      <button class="toggle" id="themeToggle" title="Light / Dark">🌗</button>
+    </div>
   </header>
 
-  <!-- LANDING -->
-  <section id="landing" class="container">
-    <div class="hero">
-      <h2 id="heroTitle">TREC BioGen 2025 — Task B</h2>
-      <p>Generate answers for 30 medical questions and compare systems.</p>
-      <button class="cta" id="openViewerBtn">Open Viewer</button>
+  <!-- HOME -->
+  <section id="home" class="container">
+    <div class="hero panel subtle">
+      <div class="content">
+        <h1>TREC BioGen 2025 — Task B</h1>
+        <p>Generate answers for 30 medical questions and compare systems, with per-sentence PMIDs.</p>
+        <button class="btn" id="openViewerBtn">Open Viewer</button>
+      </div>
     </div>
   </section>
 
-  <!-- TASK PAGE -->
-  <section id="task" class="container hide">
-    <div class="panel">
-      <h3 style="margin:0 0 8px">Task Description (summary)</h3>
-      <p class="muted" style="margin-top:0">
-        BioGen 2025 has two subtasks.
-      </p>
-      <ul>
-        <li><b>Task A — Grounding Answer:</b> For each <i>given</i> answer sentence, add up to <b>3 new PMIDs</b> that support it
-            (prior supported PMIDs are provided) and up to <b>3 PMIDs that contradict</b> it. PMIDs must come from the released PubMed snapshot.</li>
-        <li><b>Task B — Reference Attribution:</b> For each topic, generate an answer (≤ 250 words). Each sentence may include up to
-            <b>3 PMIDs</b> from the released PubMed snapshot that support the statement.</li>
-      </ul>
-      <p class="muted">Key dates: Dataset & baseline June 2, submissions Aug 15, results late Sep, papers late Oct, conference Nov 17–21.</p>
-      <p><a class="link" href="https://trec-biogen.github.io/docs/#task-description" target="_blank" rel="noopener">Official BioGen 2025 page →</a></p>
+  <!-- TASK -->
+  <section id="task" class="container hidden">
+    <div class="panel task">
+      <h2>Task Description (summary)</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="badge">Task A — Grounding Answer</div>
+          <ul>
+            <li>For each given <em>answer sentence</em>, add up to <strong>3 new PMIDs</strong> that support it (prior PMIDs are provided) and up to <strong>3 PMIDs</strong> that contradict it.</li>
+            <li>Use only the PMIDs from the released PubMed snapshot; contradicting evidence is preferred if both exist.</li>
+            <li>Submission: JSONL, one object per QA pair, with each sentence’s <code>supported_citations</code> and <code>contradicted_citations</code>.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="badge">Task B — Reference Attribution</div>
+          <ul>
+            <li>For each <em>topic</em>, generate an answer (≤ <strong>250 words</strong>). Each sentence may include up to <strong>3 PMIDs</strong> from the released PubMed snapshot that support it.</li>
+            <li>Submission: JSONL, one object per topic with <code>responses</code> as sentence objects (each has <code>text</code> + <code>citations</code>).</li>
+          </ul>
+        </div>
+        <div class="muted">
+          Key dates (2025): Dataset &amp; baselines Jun 2 · submissions Aug 15 · results late Sep · papers late Oct · TREC Nov 17–21.
+          <br />
+          Official page: <a href="https://trec-biogen.github.io/docs/#task-description" target="_blank" rel="noopener">BioGen 2025 — Task Description</a>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- VIEWER -->
-  <section id="viewer" class="container hide">
+  <section id="viewer" class="container hidden">
     <div class="panel">
-      <div class="row">
-        <div class="grow">
+      <div class="toolbar" style="margin-bottom:10px">
+        <div class="searchbar">
           <input id="q" type="text" placeholder="Search by ID, question, topic, or narrative… (e.g., ‘axonal injury’ or ‘181’)" />
+          <button id="searchBtn">Search</button>
+          <button id="toggleFilters" title="Show/Hide filters">⚙️ Filters</button>
         </div>
-        <button class="btn" id="searchBtn">Search</button>
-        <button class="btn" id="toggleFiltersBtn">Hide Filters</button>
       </div>
 
-      <div id="filters" class="row" style="margin-top:10px">
-        <div class="filters" id="systems"></div>
-
-        <div class="toolbar">
-          <label class="muted">View</label>
-          <select id="viewMode" class="select">
-            <option value="auto" selected>Auto (Tabs if multiple)</option>
-            <option value="tabs">Tabs</option>
-            <option value="columns">Columns</option>
-          </select>
-
-          <label class="muted">Text size</label>
-          <select id="textSize" class="select">
-            <option value="1.55">Comfort</option>
-            <option value="1.65" selected>Relaxed</option>
-            <option value="1.8">Spacious</option>
-          </select>
-        </div>
-        <div class="muted" id="meta" style="margin-top:6px"></div>
+      <div id="filters" class="toolbar hidden" style="margin-bottom:10px">
+        <div id="systems" class="filters"></div>
+        <label class="muted">View</label>
+        <select id="viewMode" class="select">
+          <option value="auto" selected>Auto (Tabs if multiple)</option>
+          <option value="tabs">Tabs</option>
+          <option value="columns">Columns</option>
+        </select>
+        <label class="muted">Text size</label>
+        <select id="textSize" class="select">
+          <option value="1.55">Comfort</option>
+          <option value="1.65" selected>Relaxed</option>
+          <option value="1.8">Spacious</option>
+        </select>
       </div>
 
-      <div id="results" class="panel" style="margin:12px 0 0 0">
-        <div class="muted">Type a query and press <b>Search</b>.</div>
-      </div>
+      <div class="muted" id="meta" style="margin:6px 0 10px 0"></div>
+      <div id="results"></div>
     </div>
   </section>
 
-  <div class="footer">~ cbsag · <a href="https://github.com/cbsag" target="_blank" rel="noopener">GitHub</a> ·
-    <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a></div>
+  <div class="footer">
+    ~ cbsag · <a href="https://github.com/cbsag" target="_blank" rel="noopener">GitHub</a> ·
+    <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
 
   <script>
-    /* ====== ELEMENTS ====== */
+    /* ---------- NAV / SECTIONS ---------- */
+    const sections = {
+      home:   document.getElementById('home'),
+      task:   document.getElementById('task'),
+      viewer: document.getElementById('viewer'),
+    };
     const header = document.getElementById('siteHeader');
+    const navHome = document.getElementById('navHome');
+    const navTask = document.getElementById('navTask');
+    const navViewer = document.getElementById('navViewer');
+    const themeToggle = document.getElementById('themeToggle');
+
+    function setActiveNav(id){
+      [navHome, navTask, navViewer].forEach(a => a.classList.remove('active'));
+      if (id==='home') navHome.classList.add('active');
+      if (id==='task') navTask.classList.add('active');
+      if (id==='viewer') navViewer.classList.add('active');
+    }
+    function showSection(id){
+      Object.entries(sections).forEach(([k,el]) => el.classList.toggle('hidden', k!==id));
+      setActiveNav(id);
+      window.location.hash = id;
+      window.__interacted = true; // keep header visible
+      header.classList.remove('hidden');
+    }
+    navHome.addEventListener('click', (e)=>{ e.preventDefault(); showSection('home'); });
+    navTask.addEventListener('click', (e)=>{ e.preventDefault(); showSection('task'); });
+    navViewer.addEventListener('click', (e)=>{ e.preventDefault(); showSection('viewer'); });
+
+    document.getElementById('openViewerBtn').addEventListener('click', ()=> showSection('viewer'));
+
+    // on load: route by hash, else Home
+    window.addEventListener('DOMContentLoaded', ()=>{
+      const h = (location.hash||'').replace('#','');
+      showSection(h==='task' ? 'task' : h==='viewer' ? 'viewer' : 'home');
+    });
+
+    /* ---------- THEME ---------- */
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) root.setAttribute('data-theme', savedTheme);
+    themeToggle.addEventListener('click', ()=>{
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+
+    /* ---------- VIEWER: DATA + UI ---------- */
     const systemsDiv = document.getElementById("systems");
     const resultsDiv = document.getElementById("results");
     const metaDiv = document.getElementById("meta");
     const qInput = document.getElementById("q");
     const searchBtn = document.getElementById("searchBtn");
-    const toggleFiltersBtn = document.getElementById("toggleFiltersBtn");
-    const filtersWrap = document.getElementById("filters");
-    const viewModeSel = document.getElementById('viewMode');
     const textSizeSel = document.getElementById('textSize');
-    const navHome = document.getElementById('navHome');
-    const navViewer = document.getElementById('navViewer');
-    const navTask = document.getElementById('navTask');
-    const openViewerBtn = document.getElementById('openViewerBtn');
-    const heroTitle = document.getElementById('heroTitle');
-    const themeToggle = document.getElementById('themeToggle');
-    [navHome, navTask, navViewer].forEach(el => {
-        el.addEventListener('click', () => {
-          window.__interacted = true;
-          header.classList.remove('hidden');
-        });
-      });
-    /* ====== THEME ====== */
-    (function initTheme(){
-      const saved = localStorage.getItem('theme') || 'dark';
-      if (saved === 'light') document.documentElement.setAttribute('data-theme','light');
-      themeToggle.textContent = document.documentElement.getAttribute('data-theme')==='light'?'☀️':'🌙';
-      themeToggle.addEventListener('click', ()=>{
-        const l = document.documentElement.getAttribute('data-theme')==='light';
-        document.documentElement.setAttribute('data-theme', l? '' : 'light');
-        localStorage.setItem('theme', l? 'dark':'light');
-        themeToggle.textContent = l? '🌙':'☀️';
-      });
-    })();
+    const viewModeSel = document.getElementById('viewMode');
+    const toggleFiltersBtn = document.getElementById('toggleFilters');
+    const filtersBar = document.getElementById('filters');
 
-    /* ====== NAV / PAGES ====== */
-    function setActiveNav(hash){
-      [navHome, navTask, navViewer].forEach(a=>a.classList.remove('active'));
-      if (hash==='#viewer') navViewer.classList.add('active');
-      else if (hash==='#task') navTask.classList.add('active');
-      else navHome.classList.add('active');
-    }
-    function showSection(hash){
-      document.getElementById('landing').classList.toggle('hide', hash!=='#home');
-      document.getElementById('viewer').classList.toggle('hide', hash!=='#viewer');
-      document.getElementById('task').classList.toggle('hide', hash!=='#task');
-      setActiveNav(hash);
-      // header hidden on first landing, shown after any interaction
-      header.classList.toggle('hidden', hash==='#home' && !window.__interacted);
-    }
-    function go(hash){ history.replaceState(null,'',hash); showSection(hash); }
-    window.addEventListener('hashchange', ()=>showSection(location.hash||'#home'));
-    openViewerBtn.addEventListener('click', ()=>{ window.__interacted=true; go('#viewer'); qInput.focus(); });
-    document.addEventListener('wheel', ()=>{
-      if (location.hash==='' || location.hash==='#home'){ window.__interacted=true; header.classList.remove('hidden'); }
-    });
-    document.addEventListener('keydown', (e)=>{
-      if (e.key === '/') { window.__interacted=true; go('#viewer'); qInput.focus(); e.preventDefault(); }
-    });
-    heroTitle.addEventListener('click', ()=>{ window.__interacted=true; header.classList.remove('hidden'); });
-    showSection(location.hash || '#home');
-
-    /* ====== DATA ====== */
     let allSystems = [];
     let sysDescriptions = {};
-    async function fetchSystems() {
-      const r = await fetch("/api/systems");
-      const data = await r.json();
-      allSystems = data.systems || [];
-      sysDescriptions = data.descriptions || {};
-      renderSystems();
+    let hasSearched = false;
+
+    toggleFiltersBtn.addEventListener('click', ()=>{
+      filtersBar.classList.toggle('hidden');
+    });
+
+    function selectedSystems() {
+      return Array.from(document.querySelectorAll('.chip input[type="checkbox"]:checked')).map(cb => cb.value);
     }
+
     function renderSystems() {
       systemsDiv.innerHTML = "";
       allSystems.forEach(sys => {
@@ -308,108 +317,112 @@
         chip.className = "chip";
         const desc = (sysDescriptions[sys]||"").replace(/"/g,'&quot;');
         chip.innerHTML = `
-          <input type="checkbox" value="${sys}" />
+          <input type="checkbox" value="${sys}" checked />
           <span>${sys}</span>
           <span class="muted" title="${desc}">ⓘ</span>
         `;
         systemsDiv.appendChild(chip);
       });
     }
-    function selectedSystems() {
-      return Array.from(document.querySelectorAll('.chip input[type="checkbox"]:checked')).map(cb => cb.value);
+
+    async function fetchSystems() {
+      const r = await fetch("/api/systems");
+      const data = await r.json();
+      allSystems = data.systems || [];
+      sysDescriptions = data.descriptions || {};
+      renderSystems();
     }
 
-    /* ====== SEARCH ====== */
     function splitSentences(text) {
       if (!text) return [];
       const parts = text.replace(/\s+/g, ' ').split(/(?<=[\.!?])\s+(?=[A-Z0-9])/g);
       return parts.filter(s => s && s.trim());
     }
 
-    async function doSearch() {
-      const q = qInput.value.trim();
-      const selected = selectedSystems();
-      if (!q) {
-        resultsDiv.innerHTML = `<div class="muted">Type a query and press <b>Search</b>.</div>`;
-        metaDiv.textContent = '';
-        return;
-      }
-      resultsDiv.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="muted">Loading…</div></div>`;
-      const url = `/api/search?q=${encodeURIComponent(q)}&systems=${encodeURIComponent(selected.join(","))}`;
-      const r = await fetch(url);
-      const data = await r.json();
-      renderResults(data);
+    function pmidsForSentence(item, sys, sentenceIndex){
+      // If your API includes per-sentence PMIDs, map them here.
+      // Current behavior: show PMIDs stored per answer (collected across sentences).
+      // This keeps your existing screenshots consistent.
+      const list = (item.pmids && item.pmids[sys]) || [];
+      return list.slice( sentenceIndex*3, sentenceIndex*3 + 3 ); // show a few per sentence if many
     }
-    searchBtn.addEventListener('click', doSearch);
-    qInput.addEventListener('keydown', (e)=>{ if (e.key==='Enter') doSearch(); });
 
-    toggleFiltersBtn.addEventListener('click', ()=>{
-      const hide = !filtersWrap.classList.contains('hide');
-      filtersWrap.classList.toggle('hide', hide);
-      toggleFiltersBtn.textContent = hide ? 'Show Filters' : 'Hide Filters';
-    });
-    textSizeSel.addEventListener('change', ()=>{
-      document.querySelectorAll('.ans').forEach(a => a.style.lineHeight = textSizeSel.value);
-    });
-
-    /* ====== PMIDs → details (bottom section & per sentence) ====== */
-    async function fetchPMIDsDetails(pmids) {
-      const key = pmids.join(",");
-      if (!window.__pmidCache) window.__pmidCache = new Map();
-      if (window.__pmidCache.has(key)) return window.__pmidCache.get(key);
-      const r = await fetch(`/api/pubmed?pmids=${encodeURIComponent(key)}`);
-      const data = await r.json().catch(()=>({}));
-      window.__pmidCache.set(key, data);
-      return data;
-    }
     function renderPMIDList(container, pmids) {
-      container.innerHTML = '<span class="muted">loading…</span>';
-      fetchPMIDsDetails(pmids).then(data => {
-        if (data.error) { container.innerHTML = `<span class="muted">error: ${data.error}</span>`; return; }
-        if (!data.items || !data.items.length) { container.innerHTML = '<span class="muted">no details returned</span>'; return; }
-        const ul = document.createElement('ul'); ul.className='citation-list';
-        data.items.forEach(p => {
-          const li = document.createElement('li'); li.className='citation-card';
-          const a = document.createElement('a'); a.href = p.url; a.target='_blank'; a.rel='noopener';
-          a.textContent = `${p.title} (${p.journal}${p.year ? ', ' + p.year : ''})`;
-          li.appendChild(a);
-          if (p.doi) {
-            const d = document.createElement('div'); d.className='muted'; d.style.marginTop='4px'; d.textContent = `doi: ${p.doi}`; li.appendChild(d);
-          }
-          if (p.abstract) {
-            const det = document.createElement('details'); 
-            const sum = document.createElement('summary'); sum.textContent = 'Show abstract';
-            const abs = document.createElement('div'); abs.className='absbox'; abs.textContent = p.abstract;
-            det.appendChild(sum); det.appendChild(abs);
-            li.appendChild(det);
-          }
-          ul.appendChild(li);
+      container.innerHTML = '<span class="muted">loading references…</span>';
+      fetch(`/api/pubmed?pmids=${encodeURIComponent(pmids.join(","))}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) { container.innerHTML = `<span class="muted">error: ${data.error}</span>`; return; }
+          if (!data.items || !data.items.length) { container.innerHTML = '<span class="muted">no details returned</span>'; return; }
+          const frag = document.createDocumentFragment();
+          data.items.forEach(p => {
+            const li = document.createElement('div'); li.className='card'; li.style.margin='10px 0';
+            const link = document.createElement('a'); link.href = p.url; link.target='_blank'; link.rel='noopener';
+            link.textContent = `${p.title} (${p.journal}${p.year ? ', ' + p.year : ''})`;
+            li.appendChild(link);
+            if (p.doi) { const d = document.createElement('div'); d.className='muted'; d.textContent = `doi: ${p.doi}`; li.appendChild(d); }
+            if (p.abstract) { const abs = document.createElement('div'); abs.className='abstract'; abs.textContent = p.abstract; li.appendChild(abs); }
+            frag.appendChild(li);
+          });
+          container.innerHTML = ''; container.appendChild(frag);
+        })
+        .catch(err => { container.innerHTML = `<span class="muted">error: ${String(err.message || err)}</span>`; });
+    }
+
+    function populateSentences(ansDiv, text, item, sys) {
+      ansDiv.style.lineHeight = textSizeSel.value;
+      if (!text) { ansDiv.innerHTML = "<span class='muted'>— no answer —</span>"; return; }
+
+      const sents = splitSentences(text);
+      sents.forEach((s, idx) => {
+        const row = document.createElement('div'); row.className = 'srow';
+        const dot = document.createElement('span'); dot.className = 'bullet';
+        const span = document.createElement('span'); span.className = 'text'; span.textContent = s;
+
+        // PMIDs (chips)
+        const pmids = pmidsForSentence(item, sys, idx);
+        const pmidWrap = document.createElement('div'); pmidWrap.className = 'pmids';
+        if (pmids.length) {
+          pmids.forEach(id => {
+            const chip = document.createElement('span'); chip.className='pmid';
+            chip.innerHTML = `<a href="https://pubmed.ncbi.nlm.nih.gov/${id}/" target="_blank" rel="noopener">${id}</a>`;
+            pmidWrap.appendChild(chip);
+          });
+        } else {
+          const none = document.createElement('span'); none.className='pmid muted'; none.textContent='no PubMed matches';
+          pmidWrap.appendChild(none);
+        }
+
+        // “Show refs” pulls full titles + abstracts for THIS sentence’s pmids
+        const actions = document.createElement('span'); actions.className='sactions';
+        const btn = document.createElement('button'); btn.className='smallbtn'; btn.textContent='Show refs';
+        const slot = document.createElement('div'); slot.className='muted'; slot.style.marginTop='8px';
+
+        btn.addEventListener('click', ()=>{
+          if (!pmids.length){ slot.innerHTML = '<span class="muted">no PMIDs for this sentence</span>'; return; }
+          renderPMIDList(slot, pmids);
         });
-        container.innerHTML = ''; container.appendChild(ul);
-      }).catch(err => { container.innerHTML = `<span class="muted">error: ${String(err.message || err)}</span>`; });
+
+        actions.appendChild(btn);
+        row.appendChild(dot); row.appendChild(span);
+        row.appendChild(pmidWrap); row.appendChild(actions); row.appendChild(slot);
+        ansDiv.appendChild(row);
+      });
     }
 
-    function addPMIDsSection(card, pmids) {
-      if (!pmids || !pmids.length) return;
-      const btn = document.createElement('button');
-      btn.className = 'btn';
-      btn.textContent = `Cited PMIDs (${pmids.length})`;
-      const slot = document.createElement('div');
-      slot.className = 'muted'; slot.style.marginTop = '8px';
-      btn.addEventListener('click', () => renderPMIDList(slot, pmids));
-      card.appendChild(btn);
-      card.appendChild(slot);
-    }
-
-    /* ====== RENDER ====== */
     function renderResults(data) {
       resultsDiv.innerHTML = "";
+      if (!hasSearched){
+        metaDiv.textContent = "Use the search bar above to get started.";
+        return;
+      }
       metaDiv.textContent = `${data.count} result(s) • showing: ${data.systems.join(", ")}`;
 
       data.results.forEach(item => {
         const wrap = document.createElement("div");
         wrap.className = "panel result";
 
+        // header
         const header = document.createElement("div");
         header.innerHTML = `
           <div class="qid">ID ${item.id}</div>
@@ -418,95 +431,76 @@
         `;
         wrap.appendChild(header);
 
+        // narrative
         const det = document.createElement("details");
-        const sum = document.createElement("summary"); sum.textContent = "Show narrative";
-        const p = document.createElement("div"); p.className = "muted"; p.style.marginTop = "8px"; p.textContent = item.narrative || "—";
-        det.appendChild(sum); det.appendChild(p); wrap.appendChild(det);
+        const sum = document.createElement("summary");
+        sum.textContent = "Show narrative";
+        det.appendChild(sum);
+        const p = document.createElement("div");
+        p.className = "muted";
+        p.style.marginTop = "8px";
+        p.textContent = item.narrative || "—";
+        det.appendChild(p);
+        wrap.appendChild(det);
 
-        const answersWrap = document.createElement("div"); answersWrap.className = "answers";
+        // answers area
+        const answersWrap = document.createElement("div");
+        answersWrap.className = "answers";
 
-        // systems that have non-empty answers
-        const sysList = Object.entries(item.answers)
-            .filter(([_, obj]) => obj && (obj.text || (obj.sentences && obj.sentences.length)));
+        const sysList = Object.entries(item.answers).filter(([, text]) => text && text.trim());
         const multi = sysList.length > 1;
-        const mode = (viewModeSel.value === 'auto') ? (multi ? 'tabs' : 'single') : viewModeSel.value;
-
-        function populateCard(cardBody, ansObj, sysName){
-          // Use server-provided sentence alignment if available
-          const sents = ansObj.sentences && ansObj.sentences.length
-            ? ansObj.sentences.map(x => ({t:x.text, pmids:x.pmids||[]}))
-            : splitSentences(ansObj.text).map(t => ({t, pmids:[]})); // fallback
-
-          cardBody.style.lineHeight = textSizeSel.value;
-          sents.forEach(({t, pmids})=>{
-            const row = document.createElement('div'); row.className = 'srow';
-            const dot = document.createElement('span'); dot.className = 'bullet';
-            const span = document.createElement('span'); span.className = 'text'; span.textContent = t;
-            row.appendChild(dot); row.appendChild(span);
-
-            if (pmids && pmids.length){
-              const pm = document.createElement('div'); pm.className='pmids';
-              const label = document.createElement('span'); label.className='muted'; label.textContent = 'PMIDs:';
-              pm.appendChild(label);
-              pmids.slice(0,3).forEach(id=>{
-                const chip = document.createElement('a'); chip.className='pill link'; chip.target="_blank";
-                chip.rel='noopener'; chip.href=`https://pubmed.ncbi.nlm.nih.gov/${id}/`; chip.textContent=id;
-                pm.appendChild(chip);
-              });
-              // “Show refs” button (loads details for exactly these PMIDs)
-              const btn = document.createElement('button'); btn.className='btn'; btn.style.padding='3px 8px'; btn.textContent='Show refs';
-              const slot = document.createElement('div'); slot.className='muted'; slot.style.marginTop='6px';
-              btn.addEventListener('click', ()=> renderPMIDList(slot, pmids));
-              pm.appendChild(btn); row.appendChild(pm); row.appendChild(slot);
-            }
-            cardBody.appendChild(row);
-          });
-
-          // bottom: union PMIDs for the whole answer (if present)
-          if (ansObj.pmids_all && ansObj.pmids_all.length) {
-            addPMIDsSection(cardBody.parentElement, ansObj.pmids_all);
-          } else if (item.pmids && item.pmids[sysName] && item.pmids[sysName].length) {
-            addPMIDsSection(cardBody.parentElement, item.pmids[sysName]);
-          }
-        }
+        const mode = viewModeSel.value === 'auto' ? (multi ? 'tabs' : 'single') : viewModeSel.value;
 
         if (!multi || mode === 'single') {
-          const [sys, ansObj] = sysList[0] || ["System", {text:""}];
-          const card = document.createElement("div"); card.className = "card";
+          const [sys, text] = sysList[0] || Object.entries(item.answers)[0] || ["System", ""];
+          const card = document.createElement("div");
+          card.className = "card";
           card.innerHTML = `<div class="sys">${sys}</div><div class="ans"></div>`;
           answersWrap.appendChild(card);
-          populateCard(card.querySelector('.ans'), ansObj, sys);
+          populateSentences(card.querySelector('.ans'), text, item, sys);
 
         } else if (mode === 'tabs') {
           const tabs = document.createElement('div'); tabs.className = 'tabs';
           const contents = document.createElement('div');
-          sysList.forEach(([sys, ansObj], idx)=>{
-            const t = document.createElement('button'); t.className = 'tab' + (idx===0 ? ' active' : ''); t.textContent = sys;
+
+          sysList.forEach(([sys, text], idx) => {
+            const t = document.createElement('button');
+            t.className = 'tab' + (idx === 0 ? ' active' : '');
+            t.textContent = sys;
             tabs.appendChild(t);
-            const c = document.createElement('div'); c.className = 'tabcontent' + (idx===0 ? ' active' : '');
-            const card = document.createElement('div'); card.className='card';
-            card.innerHTML=`<div class="sys">${sys}</div><div class="ans"></div>`;
-            c.appendChild(card); contents.appendChild(c);
-            populateCard(card.querySelector('.ans'), ansObj, sys);
-            t.addEventListener('click', ()=>{
-              tabs.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-              contents.querySelectorAll('.tabcontent').forEach(x=>x.classList.remove('active'));
+
+            const c = document.createElement('div');
+            c.className = 'tabcontent' + (idx === 0 ? ' active' : '');
+            const card = document.createElement('div'); card.className = 'card';
+            card.innerHTML = `<div class="sys">${sys}</div><div class="ans"></div>`;
+            c.appendChild(card);
+            contents.appendChild(c);
+
+            populateSentences(card.querySelector('.ans'), text, item, sys);
+
+            t.addEventListener('click', () => {
+              tabs.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+              contents.querySelectorAll('.tabcontent').forEach(x => x.classList.remove('active'));
               t.classList.add('active'); c.classList.add('active');
             });
           });
-          answersWrap.appendChild(tabs); answersWrap.appendChild(contents);
 
-        } else { // columns
+          answersWrap.appendChild(tabs);
+          answersWrap.appendChild(contents);
+
+        } else {
           const grid = document.createElement('div');
           grid.style.display = 'grid';
           grid.style.gridTemplateColumns = `repeat(${Math.min(sysList.length, 3)}, minmax(320px, 1fr))`;
           grid.style.gap = '16px';
-          sysList.forEach(([sys, ansObj])=>{
+
+          sysList.forEach(([sys, text]) => {
             const card = document.createElement('div'); card.className = 'card';
             card.innerHTML = `<div class="sys">${sys}</div><div class="ans"></div>`;
             grid.appendChild(card);
-            populateCard(card.querySelector('.ans'), ansObj, sys);
+            populateSentences(card.querySelector('.ans'), text, item, sys);
           });
+
           answersWrap.appendChild(grid);
         }
 
@@ -515,12 +509,40 @@
       });
     }
 
-    /* ====== INIT ====== */
-    (async function init(){
+    async function doSearch() {
+      hasSearched = true;
+      resultsDiv.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="muted">Loading…</div></div>`;
+      const q = qInput.value;
+      const selected = selectedSystems();
+      const url = `/api/search?q=${encodeURIComponent(q)}&systems=${encodeURIComponent(selected.join(","))}`;
+      const r = await fetch(url);
+      const data = await r.json();
+      renderResults(data);
+    }
+
+    // Search triggers only on button click or Enter (no live typing fetch)
+    searchBtn.addEventListener('click', doSearch);
+    qInput.addEventListener('keydown', (e)=>{ if (e.key==='Enter') doSearch(); });
+
+    // text size live
+    textSizeSel.addEventListener('change', ()=>{
+      document.querySelectorAll('.ans').forEach(a => a.style.lineHeight = textSizeSel.value);
+    });
+
+    // init systems
+    (async function init() {
       await fetchSystems();
-      // start at Home: header hidden until interaction
-      setActiveNav(location.hash||'#home');
+      // do NOT auto-search; wait until user hits Search
+      // keep filters hidden until user opens them
     })();
+
+    // Ensure header visible when clicking any nav (prevents “stuck” state)
+    [navHome, navTask, navViewer].forEach(a=>{
+      a.addEventListener('click', ()=>{
+        window.__interacted = true;
+        header.classList.remove('hidden');
+      });
+    });
   </script>
 </body>
 </html>
