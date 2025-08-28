@@ -119,11 +119,11 @@ function searchItems(query) {
 
 function loadDescriptions() {
   const defaultDesc = {
-    "System A": "Baseline + Qwen (placeholder).",
-    "System B": "TF-IDF / BM25 pipeline (placeholder).",
-    "System C": "BM25 + reformulations; MedCPT bi-encoder + cross-encoder rerank.",
-    "System D": "BM25 original; keep top-30 after rerank; MedCPT bi+cross encoder.",
-    "System E": "Placeholder.",
+    "System A": "Baseline\n• BM25 retrieval\n• Cross-encoder re-ranking\n• Qwen2.5-Coder generation",
+    "System B": "Three-stage\n• Query reformulation\n• Retrieval → cross-encoder re-ranking\n• Summarizer + Qwen2.5-Coder",
+    "System C": "Two-stage\n• Reformulation\n• MedCPT bi-encoder retrieval\n• Qwen2.5-Coder",
+    "System D": "Two-stage • broader corpus\n• Reformulation\n• MedCPT bi-encoder retrieval\n• Qwen2.5-Coder",
+    "System E": "Three-stage • broader corpus\n• Reformulation\n• Retrieval → cross-encoder re-ranking\n• Summarizer + Qwen2.5-Coder"
   };
   const p = path.join(DATA_DIR, "system_descriptions.json");
   const raw = safeRead(p); if (!raw) return defaultDesc;
