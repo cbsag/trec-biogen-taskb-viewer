@@ -169,7 +169,7 @@
   <section id="landing" class="container">
     <div class="hero">
       <h2 id="heroTitle">TREC BioGen 2025 — Task B</h2>
-      <p>Generate answers for 30 medical questions and compare systems.</p>
+      <p>Generated answers for 30 medical questions and compare mutiple system results.</p>
       <button class="cta" id="openViewerBtn">Open Viewer</button>
     </div>
   </section>
@@ -285,11 +285,27 @@
       document.getElementById('task').classList.toggle('hide', hash!=='#task');
       setActiveNav(hash);
       header.classList.toggle('hidden', hash==='#home' && !window.__interacted);
-      window.scrollTo({top:0, behavior:'instant'});
+      // window.scrollTo({top:0, behavior:'instant'});
+      window.scrollTo(0, 0);
     }
     function go(hash){ history.replaceState(null,'',hash); showSection(hash); }
     window.addEventListener('hashchange', ()=>showSection(location.hash||'#home'));
-    openViewerBtn.addEventListener('click', ()=>{ window.__interacted=true; go('#viewer'); qInput.focus(); });
+    // openViewerBtn.addEventListener('click', ()=>{ window.__interacted=true; go('#viewer'); qInput.focus(); });
+    openViewerBtn.addEventListener('click', () => {
+      window.__interacted = true;
+      header.classList.remove('hidden');
+
+      // show viewer, hide everything else right away
+      document.getElementById('landing').classList.add('hide');
+      document.getElementById('viewer').classList.remove('hide');
+      document.getElementById('task').classList.add('hide');
+
+      setActiveNav('#viewer');
+      history.replaceState(null, '', '#viewer');
+
+      qInput.focus({ preventScroll: true });
+      window.scrollTo(0, 0);
+    });
     document.addEventListener('wheel', ()=>{
       if (location.hash==='' || location.hash==='#home'){ window.__interacted=true; header.classList.remove('hidden'); }
     });
