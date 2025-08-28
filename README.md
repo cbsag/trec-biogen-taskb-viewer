@@ -1,62 +1,91 @@
-# TREC BioGen 2025 — Task B Viewer (Vercel)
+# TREC BioGen 2025 — Task B Viewer
 
-A Vercel-ready project with a static frontend and Node.js serverless APIs that search your Task B questions and compare answers across systems.
+A lightweight, Vercel-friendly viewer to **search topics** and **compare sentence-level, cited answers** across systems for **BioGen 2025 (Task B: Reference Attribution)**. It supports dark/light theme, tabs/columns layouts, inline PMID chips, and on-demand PubMed details.
 
-## What’s included
-- `/public/index.html` — static UI
-- `/api/search.js` & `/api/systems.js` — serverless endpoints
-- `/data/` — your data files:
-  - `task_b.json`
-  - `System_A_output.jsonl` … `System_E_output.jsonl`
-  - `system_descriptions.json` (edit this to change the tooltip text in the UI)
+---
 
-## Local preview (with Vercel CLI)
-1. Install the CLI: `npm i -g vercel`
-2. From this folder: `vercel dev`
-3. Open http://localhost:3000
+## What’s inside
+- `/public/index.html` — single-page UI (Home / Task / Viewer / Team)
+- `/api/systems.js` — list of systems + descriptions
+- `/api/search.js` — search topics and return answers by system
+- `/api/pubmed.js` — batch PMID → details (title, journal, year, doi, url, abstract)
+- `/data/`
+  - `task_b.json` — topics (`id`, `question`, `topic`, `narrative`)
+  - `System_A_output.jsonl` … `System_E_output.jsonl` — system outputs
+  - `system_descriptions.json` — tooltip text for system chips
 
-## Deploy to Vercel
-1. Create a new GitHub repo and push these files.
-2. On vercel.com: “New Project” → import your repo → deploy with defaults.
-   - `vercel.json` is already set up.
-   - No framework build needed; static + serverless only.
-3. Visit your project URL.
+> **Tip:** You do **not** need `vercel.json`. Enter via `/` and use the in-app navigation. If you want deep links (e.g., `/viewer`) to work on cold loads, you can add a rewrite later.
 
-## Notes
-- Search is token-based across `id`, `question`, `topic`, `narrative`.
-- JSONL parsing is flexible: it supports lines with
-  - `{"metadata":{"topic_id":181}, "responses":[{"text":"..."}]}`
-  - or `{"id":181, "answer":"..."}`
-  - or `{"id":181, "text":"..."}`
-- If multiple lines exist for the same topic in a system file, texts are concatenated with bullets.
+---
 
-
-## PubMed citation search
-- The UI now shows a *Find PubMed cites* button next to each sentence.
-- Serverless endpoint: `/api/cite?sentence=...&retmax=5`
-- Optional environment variables (Vercel → Settings → Environment Variables):
-  - `PUBMED_API_KEY` (NCBI E-utilities key) to raise rate limits
-  - `CONTACT_EMAIL` (your email) for polite User-Agent tagging
-
-
-## Auto‑cite sentences (toggle)
-- A toggle appears beside the system chips. When enabled, the UI will automatically fetch PubMed citations for the first few sentences (default 5) of each system answer.
-- You can still click the button next to any sentence to fetch citations on demand.
-- Tune limits by editing `AUTO_CITE_PER_ANSWER_LIMIT` and `AUTO_CITE_RETMAX` in `/public/index.html`.
-
-## Vercel deployment steps
-1. **Unzip** this project and run `git init`, then commit and push to **GitHub**.
-2. On **vercel.com**: click **New Project → Import** your GitHub repo.
-3. Use defaults (the provided `vercel.json` routes static `/public` and `/api/*`).
-4. In **Project → Settings → Environment Variables**, set optional:
-   - `PUBMED_API_KEY` → your NCBI E-utilities key (recommended to increase limits)
-   - `CONTACT_EMAIL` → an email for polite `User-Agent` identification
-5. **Deploy**. Your app URL will be live; `/api/cite` will be callable from the UI.
-
-### Local preview
+## Quick start (local)
 ```bash
 npm i -g vercel
 vercel dev
+# open http://localhost:3000
 ```
 
-# trec-biogen-taskb-viewer
+The UI calls `/api/systems`, `/api/search`, and `/api/pubmed`. With `/data` in place, you’ll see results immediately.
+
+---
+
+## Deploy to Vercel (no build step)
+1. Push the project to a new GitHub repo.
+2. On https://vercel.com → **New Project** → import the repo → **Deploy** (defaults are fine).
+
+### Optional: clean URLs
+If you need direct links like `/viewer` or `/task` to work when loaded fresh, add a `vercel.json` rewrite to route all paths to `/public/index.html`.
+
+---
+
+## Data formats
+
+### `/data/task_b.json`
+```json
+[
+  { "id": "181", "question": "...", "topic": "...", "narrative": "..." }
+]
+```
+
+### `/data/System_X_output.jsonl`
+Each line = one topic. Any of these shapes are accepted:
+```json
+{"metadata":{"topic_id":"181"},"responses":[
+  { "text": "Sentence 1.", "citations": ["31604329","22802756"] },
+  { "text": "Sentence 2.", "citations": ["30508923"] }
+]}
+```
+```json
+{"id":"181","text":"Full answer text…"}        // UI auto-splits into sentences (no PMIDs)
+```
+```json
+{"id":"181","answer":"Full answer text…"}      // alias for "text"
+```
+If multiple lines exist for the same topic in a system file, the viewer concatenates them as bullets.
+
+---
+
+## API (serverless)
+
+- `GET /api/systems` → `{"systems":[...],"descriptions":{...}}`
+- `GET /api/search?q=<query>&systems=<comma_list>` → matches `id`, `question`, `topic`, `narrative`
+- `GET /api/pubmed?pmids=<comma_list>` → details for PMIDs (title, journal, year, doi, url, abstract)
+
+---
+
+## Team
+- **Ganesh Chandrasekar (cbsag)** — <https://www.linkedin.com/in/cbsag/>
+- **Benjamin Lofo** — <https://www.linkedin.com/in/lamungu/>
+- **Aleksandr Vinokhodov** — <https://www.linkedin.com/in/aleksandr-vinokhodov/>
+
+(Also listed on the in-app **Team** page.)
+
+---
+
+## License
+**MIT License** — you’re free to adapt and redistribute this viewer. Replace the license if your project requires a different one.
+
+---
+
+## Acknowledgments
+Huge thanks to the **TREC BioGen organizers** and **NIST** for the task specification, datasets, and evaluation framework that made this viewer useful.
