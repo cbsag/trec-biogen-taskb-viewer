@@ -11,7 +11,6 @@
       --line:#212b4f; --line2:#273463; --accent:#7c3aed; --accent-weak:#2e2058;
       --chip:#101739; --chip-bd:#2a3560; --pill:#211948; --pill-bd:#3c2d74;
       --shadow: 0 10px 30px rgba(0,0,0,.25);
-      /* better contrast for links in dark */
       --link:#eadcff; --link-hover:#ffffff;
     }
     [data-theme="light"]{
@@ -28,8 +27,28 @@
       margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
       color:var(--text); background:var(--bg);
     }
+    [data-theme="light"] .nav a.active{
+      background: #ece6ff;        /* soft purple chip */
+      border-color: #6d28d9;      /* accent border */
+      color: #2a167a;             /* readable text */
+      box-shadow: 0 0 0 3px rgba(109,40,217,.12) inset;
+      font-weight: 600;
+    }
 
-    /* ---------- GLOBAL BACKGROUND ANIMATION (both pages) ---------- */
+    /* Hover state in light mode (keeps contrast) */
+    [data-theme="light"] .nav a:hover{
+      background:#f2edff;
+      border-color:#a88df2;
+      color:#2a167a;
+    }
+
+    /* Keyboard focus ring (both themes) */
+    .nav a:focus-visible{
+      outline:2px solid var(--accent);
+      outline-offset:2px;
+      border-radius:10px;
+    }
+    /* ---------- GLOBAL BACKGROUND ANIMATION (all pages) ---------- */
     .bgfx{position:fixed; inset:0; z-index:-2; overflow:hidden}
     .bgfx::before{
       content:""; position:absolute; inset:-20% -10% -10% -10%;
@@ -39,7 +58,7 @@
         radial-gradient(30% 60% at 60% 90%, #171d48 0%, transparent 60%),
         radial-gradient(20% 30% at 10% 85%, #2c114b 0%, transparent 60%);
       filter:blur(38px); animation:float 16s ease-in-out infinite alternate;
-      opacity:.70; /* a touch stronger so it’s visible everywhere */
+      opacity:.70;
     }
     .bgfx .wavy{
       position:absolute; inset:0; pointer-events:none;
@@ -105,7 +124,7 @@
     .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .select{border:1px solid var(--line2);background:var(--bg2);color:var(--text);border-radius:8px;padding:6px 8px}
 
-    /* ---------- RESULTS ---------- */
+    /* ---------- RESULTS (Viewer) ---------- */
     .result{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}
     .qid{font-weight:700;font-size:12px;color:var(--muted)}
     .qt{font-size:18px;font-weight:800;margin:6px 0 4px}
@@ -123,7 +142,6 @@
     .srow .text{display:inline}
     .srow .pmids{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
     .pill{font-size:12px;border:1px solid var(--line2);background:var(--bg2);padding:3px 8px;border-radius:999px}
-    .srow .actions{display:inline-flex;gap:8px;margin-left:8px}
 
     .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
     .tab{padding:6px 10px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);cursor:pointer}
@@ -146,6 +164,17 @@
     .link{color:var(--link);text-decoration:none}
     .link:hover{color:var(--link-hover);text-decoration:underline}
 
+    /* --- Task page helpers --- */
+    .codebox{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: var(--bg2); border: 1px solid var(--line2);
+      border-radius: 12px; padding: 12px; overflow: auto; font-size: 13px; line-height: 1.5;
+    }
+    .badge{
+      display:inline-block;padding:2px 8px;margin-left:8px;border-radius:999px;
+      border:1px solid var(--line2); background:var(--bg2); font-size:12px; color:var(--muted)
+    }
+
     .hide{display:none}
   </style>
 </head>
@@ -155,9 +184,10 @@
   <header id="siteHeader" class="hidden">
     <nav class="nav">
       <h1>TREC BioGen 2025 — Task B</h1>
-      <a href="#home" id="navHome">Home</a>
-      <a href="#task" id="navTask">Task</a>
-      <a href="#viewer" id="navViewer">Viewer</a>
+      <!-- Use path links; SPA router will intercept -->
+      <a href="/" id="navHome">Home</a>
+      <a href="/task" id="navTask">Task</a>
+      <a href="/viewer" id="navViewer">Viewer</a>
       <span class="spacer"></span>
       <a href="https://github.com/cbsag/trec-biogen-taskb-viewer" target="_blank" rel="noopener">GitHub</a>
       <a href="https://www.linkedin.com/in/cbsag" target="_blank" rel="noopener">LinkedIn</a>
@@ -165,30 +195,69 @@
     </nav>
   </header>
 
-  <!-- LANDING -->
+  <!-- HOME / LANDING -->
   <section id="landing" class="container">
     <div class="hero">
       <h2 id="heroTitle">TREC BioGen 2025 — Task B</h2>
-      <p>Generated answers for 30 medical questions and compare mutiple system results.</p>
+      <p>Generate answers for 30 medical questions and compare multiple systems.</p>
       <button class="cta" id="openViewerBtn">Open Viewer</button>
     </div>
   </section>
 
-  <!-- TASK PAGE -->
+  <!-- TASK PAGE (focused on Task B) -->
   <section id="task" class="container hide">
     <div class="panel">
-      <h3 style="margin:0 0 8px">Task Description (summary)</h3>
-      <p class="muted" style="margin-top:0">
-        BioGen 2025 has two subtasks.
+      <h2 style="margin:0 0 6px">Task B — Reference Attribution</h2>
+      <p class="muted" style="margin:0 0 12px">
+        Given a biomedical <b>topic (question)</b> and a stable PubMed snapshot, generate a short answer (≤ 250 words).
+        <b>Every sentence</b> in the answer may include up to <b>3 PubMed IDs (PMIDs)</b> that support that sentence. PMIDs must come
+        from the released corpus snapshot. <span class="badge">Focus of this viewer</span>
       </p>
+
+      <h3 style="margin:14px 0 8px">What you submit</h3>
       <ul>
-        <li><b>Task A — Grounding Answer:</b> For each <i>given</i> answer sentence, add up to <b>3 new PMIDs</b> that support it
-            (prior supported PMIDs are provided) and up to <b>3 PMIDs that contradict</b> it. PMIDs must come from the released PubMed snapshot.</li>
-        <li><b>Task B — Reference Attribution:</b> For each topic, generate an answer (≤ 250 words). Each sentence may include up to
-            <b>3 PMIDs</b> from the released PubMed snapshot that support the statement.</li>
+        <li>One UTF-8 <b>JSONL</b> run. Each line corresponds to one topic.</li>
+        <li>Each line contains <code>metadata</code> and a <code>responses</code> list (one entry per generated sentence).</li>
+        <li>Per sentence: the <code>text</code> and up to <b>3</b> supporting <code>citations</code> (PMIDs). Order does not matter.</li>
+        <li>Total answer length: <b>≤ 250 words</b>.</li>
       </ul>
-      <p class="muted">Key dates: Dataset & baseline June 2, submissions Aug 15, results late Sep, papers late Oct, conference Nov 17–21.</p>
-      <p><a class="link" href="https://trec-biogen.github.io/docs/#task-description" target="_blank" rel="noopener">Official BioGen 2025 page →</a></p>
+
+      <h3 style="margin:16px 0 8px">Run format (JSONL example)</h3>
+      <div class="codebox"><pre>{
+  "metadata": {
+    "team_id": "your_team",
+    "run_id": "yourteam-run-001",
+    "topic_id": "181"
+  },
+  "responses": [
+    { "text": "First sentence of your answer.", "citations": ["31604329", "22802756"] },
+    { "text": "Second sentence of your answer.", "citations": ["30508923"] }
+  ]
+}</pre></div>
+
+      <h3 style="margin:16px 0 8px">Timeline (BioGen 2025)</h3>
+      <ul>
+        <li><b>Dataset & Baseline:</b> June 2, 2025</li>
+        <li><b>Submission deadline:</b> August 15, 2025</li>
+        <li><b>Results:</b> late September 2025</li>
+        <li><b>Notebook paper:</b> late October 2025</li>
+        <li><b>TREC conference:</b> Nov 17–21, 2025</li>
+      </ul>
+
+      <p style="margin:10px 0 0">
+        <a class="link" href="https://trec-biogen.github.io/docs/#task-description" target="_blank" rel="noopener">
+          Official task page →
+        </a>
+      </p>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin:0 0 8px">Task A — Grounding Answer (quick glance)</h3>
+      <ul>
+        <li>Input: a question and an existing answer sentence (with older supported PMIDs).</li>
+        <li>Output: up to <b>3 new supporting PMIDs</b> and up to <b>3 contradicting PMIDs</b> per sentence (from the released corpus).</li>
+        <li>Contradicting evidence is prioritized if both are found.</li>
+      </ul>
     </div>
   </section>
 
@@ -252,13 +321,6 @@
     const heroTitle = document.getElementById('heroTitle');
     const themeToggle = document.getElementById('themeToggle');
 
-    [navHome, navTask, navViewer].forEach(el => {
-      el.addEventListener('click', () => {
-        window.__interacted = true;
-        header.classList.remove('hidden');
-      });
-    });
-
     /* ====== THEME ====== */
     (function initTheme(){
       const saved = localStorage.getItem('theme') || 'dark';
@@ -272,50 +334,65 @@
       });
     })();
 
-    /* ====== NAV / PAGES ====== */
-    function setActiveNav(hash){
-      [navHome, navTask, navViewer].forEach(a=>a.classList.remove('active'));
-      if (hash==='#viewer') navViewer.classList.add('active');
-      else if (hash==='#task') navTask.classList.add('active');
-      else navHome.classList.add('active');
+    /* ====== ROUTER (paths: /, /task, /viewer) ====== */
+    function routeFromLocation(){
+      const p = location.pathname.replace(/\/+$/,'').toLowerCase();
+      if (p === '' || p === '/') return '#home';
+      if (p.endsWith('/task')) return '#task';
+      if (p.endsWith('/viewer')) return '#viewer';
+      // fallback to hash (if someone keeps old links)
+      const h = (location.hash||'').toLowerCase();
+      if (h === '#task' || h === '#viewer') return h;
+      return '#home';
     }
-    function showSection(hash){
-      document.getElementById('landing').classList.toggle('hide', hash!=='#home');
-      document.getElementById('viewer').classList.toggle('hide', hash!=='#viewer');
-      document.getElementById('task').classList.toggle('hide', hash!=='#task');
-      setActiveNav(hash);
-      header.classList.toggle('hidden', hash==='#home' && !window.__interacted);
-      // window.scrollTo({top:0, behavior:'instant'});
+    function setActiveNav(route){
+      navHome.classList.toggle('active', route==='#home');
+      navTask.classList.toggle('active', route==='#task');
+      navViewer.classList.toggle('active', route==='#viewer');
+    }
+    function showSection(route){
+      document.getElementById('landing').classList.toggle('hide', route!=='#home');
+      document.getElementById('task').classList.toggle('hide', route!=='#task');
+      document.getElementById('viewer').classList.toggle('hide', route!=='#viewer');
+      setActiveNav(route);
+      header.classList.toggle('hidden', route==='#home' && !window.__interacted);
       window.scrollTo(0, 0);
     }
-    function go(hash){ history.replaceState(null,'',hash); showSection(hash); }
-    window.addEventListener('hashchange', ()=>showSection(location.hash||'#home'));
-    // openViewerBtn.addEventListener('click', ()=>{ window.__interacted=true; go('#viewer'); qInput.focus(); });
-    openViewerBtn.addEventListener('click', () => {
+    function renderRoute(){ showSection(routeFromLocation()); }
+    function navigate(path){
+      history.pushState(null, '', path);
+      renderRoute();
+    }
+    window.addEventListener('popstate', renderRoute);
+
+    // Intercept nav clicks so we SPA without reloads
+    [navHome, navTask, navViewer].forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        window.__interacted = true;
+        header.classList.remove('hidden');
+        navigate(a.getAttribute('href'));
+      });
+    });
+
+    // Open Viewer button -> real page (/viewer)
+    openViewerBtn.addEventListener('click', ()=>{
       window.__interacted = true;
       header.classList.remove('hidden');
-
-      // show viewer, hide everything else right away
-      document.getElementById('landing').classList.add('hide');
-      document.getElementById('viewer').classList.remove('hide');
-      document.getElementById('task').classList.add('hide');
-
-      setActiveNav('#viewer');
-      history.replaceState(null, '', '#viewer');
-
-      qInput.focus({ preventScroll: true });
-      window.scrollTo(0, 0);
+      navigate('/viewer');
+      qInput && qInput.focus({preventScroll:true});
     });
+
+    // Reveal header after any interaction on Home
     document.addEventListener('wheel', ()=>{
-      if (location.hash==='' || location.hash==='#home'){ window.__interacted=true; header.classList.remove('hidden'); }
+      if (routeFromLocation()==='#home'){ window.__interacted=true; header.classList.remove('hidden'); }
     });
     document.addEventListener('keydown', (e)=>{
-      if (e.key === '/') { window.__interacted=true; go('#viewer'); qInput.focus(); e.preventDefault(); }
+      if (e.key === '/') { window.__interacted=true; navigate('/viewer'); qInput?.focus(); e.preventDefault(); }
     });
     heroTitle.addEventListener('click', ()=>{ window.__interacted=true; header.classList.remove('hidden'); });
-    showSection(location.hash || '#home');
 
-    /* ====== DATA (ensure systems are loaded before first search) ====== */
+    /* ====== DATA (systems) ====== */
     let allSystems = [];
     let sysDescriptions = {};
     let systemsReady = false;
@@ -328,9 +405,7 @@
       renderSystems();
       systemsReady = true;
     }
-    async function ensureSystemsLoaded(){
-      if (!systemsReady) await fetchSystems();
-    }
+    async function ensureSystemsLoaded(){ if (!systemsReady) await fetchSystems(); }
 
     function renderSystems() {
       systemsDiv.innerHTML = "";
@@ -346,15 +421,13 @@
         systemsDiv.appendChild(chip);
       });
     }
-
-    /* robust: if nothing checked (or filters not mounted yet) use all systems */
     function selectedSystems() {
       const boxes = Array.from(document.querySelectorAll('#systems input[type="checkbox"]'));
       const checked = boxes.filter(cb => cb.checked).map(cb => cb.value);
       return checked.length ? checked : allSystems.slice();
     }
 
-    /* ====== SEARCH ====== */
+    /* ====== VIEWER: Search ====== */
     function splitSentences(text) {
       if (!text) return [];
       const parts = text.replace(/\s+/g, ' ').split(/(?<=[\.!?])\s+(?=[A-Z0-9])/g);
@@ -362,8 +435,7 @@
     }
 
     async function doSearch() {
-      await ensureSystemsLoaded();               // <-- critical: wait for systems
-
+      await ensureSystemsLoaded();
       const q = qInput.value.trim();
       const selected = selectedSystems();
       if (!q) {
@@ -438,7 +510,7 @@
       card.appendChild(slot);
     }
 
-    /* ====== RENDER ====== */
+    /* ====== VIEWER: Render ====== */
     function renderResults(data) {
       resultsDiv.innerHTML = "";
       metaDiv.textContent = `${data.count} result(s) • showing: ${data.systems.join(", ")}`;
@@ -469,10 +541,9 @@
         const mode = (viewModeSel.value === 'auto') ? (multi ? 'tabs' : 'single') : viewModeSel.value;
 
         function populateCard(cardBody, ansObj, sysName){
-          // Use server-provided sentence alignment if available
           const sents = ansObj.sentences && ansObj.sentences.length
             ? ansObj.sentences.map(x => ({t:x.text, pmids:x.pmids||[]}))
-            : splitSentences(ansObj.text).map(t => ({t, pmids:[]})); // fallback
+            : splitSentences(ansObj.text).map(t => ({t, pmids:[]}));
 
           cardBody.style.lineHeight = textSizeSel.value;
           sents.forEach(({t, pmids})=>{
@@ -490,7 +561,6 @@
                 chip.rel='noopener'; chip.href=`https://pubmed.ncbi.nlm.nih.gov/${id}/`; chip.textContent=id;
                 pm.appendChild(chip);
               });
-              // “Show refs” button (loads details for exactly these PMIDs)
               const btn = document.createElement('button'); btn.className='btn'; btn.style.padding='3px 8px'; btn.textContent='Show refs';
               const slot = document.createElement('div'); slot.className='muted'; slot.style.marginTop='6px';
               btn.addEventListener('click', ()=> renderPMIDList(slot, pmids));
@@ -499,7 +569,6 @@
             cardBody.appendChild(row);
           });
 
-          // bottom: union PMIDs for the whole answer (if present)
           if (ansObj.pmids_all && ansObj.pmids_all.length) {
             addPMIDsSection(cardBody.parentElement, ansObj.pmids_all);
           } else if (item.pmids && item.pmids[sysName] && item.pmids[sysName].length) {
@@ -555,7 +624,8 @@
     /* ====== INIT ====== */
     (async function init(){
       await fetchSystems();
-      setActiveNav(location.hash||'#home');
+      // Activate SPA routing & initial render
+      renderRoute();
     })();
   </script>
 </body>
