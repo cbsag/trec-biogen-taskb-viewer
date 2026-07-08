@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronDown, ExternalLink } from "lucide-react";
 
@@ -108,6 +109,39 @@ export default function OverviewPage() {
               <strong>{sparseNarrow.citationContradiction.toFixed(2)}</strong>
               <span>Lowest contradiction</span>
               <small>System B · Sparse narrow</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="researcher-band" aria-labelledby="researcher-heading">
+        <div className="shell researcher-layout">
+          <div className="researcher-portrait">
+            <Image
+              src="/ganesh-chandrasekar.jpg"
+              alt="Ganesh Chandrasekar"
+              width={240}
+              height={300}
+              sizes="(max-width: 780px) 104px, 150px"
+            />
+          </div>
+          <div className="researcher-copy">
+            <span className="section-kicker">About the researcher</span>
+            <h2 id="researcher-heading">Built by Ganesh Chandrasekar.</h2>
+            <p>
+              I am an ML and NLP engineer researching evidence-grounded
+              biomedical question answering, retrieval, and trustworthy LLM
+              evaluation at Concordia University.
+            </p>
+            <div className="researcher-links">
+              <Link href="/about">
+                About Ganesh
+                <ArrowRight size={14} aria-hidden="true" />
+              </Link>
+              <a href="https://cbsag.me" target="_blank" rel="noreferrer">
+                Portfolio
+                <ExternalLink size={13} aria-hidden="true" />
+              </a>
             </div>
           </div>
         </div>

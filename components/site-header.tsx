@@ -6,10 +6,11 @@ import { ExternalLink, Moon, Sun } from "lucide-react";
 import { useEffect, useSyncExternalStore } from "react";
 
 const navigation = [
-  { href: "/", label: "Overview" },
+  { href: "/", label: "Home" },
   { href: "/shared-task", label: "Explorer" },
   { href: "/results", label: "Results" },
   { href: "/thesis", label: "Thesis" },
+  { href: "/about", label: "About" },
 ];
 
 type ColorMode = "paper" | "focus";
