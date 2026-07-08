@@ -17,11 +17,12 @@ a reserved thesis-release page for systems that are not public yet.
 - Official answer-quality and citation-quality result tables.
 - Release-status page for future thesis systems after defense/publication.
 
-## Data
+## Data and API
 
-The current public demo is fully static/precomputed. It does not require private
-API keys, PubMed API access, model checkpoints, GPU inference, or a live
-generation backend.
+The system outputs are static and precomputed. They do not require model
+checkpoints, GPU inference, or a live generation backend. Optional server-side
+PubMed requests supply article metadata and citation search without exposing
+credentials to the browser.
 
 The Next.js app reads:
 
@@ -32,8 +33,16 @@ The Next.js app reads:
 - `data/shared-task/system-d.jsonl`
 - `data/shared-task/system-e.jsonl`
 
-Legacy serverless API files from the earlier static viewer are not required for
-this version and are not included in the new app path.
+The app exposes these serverless routes:
+
+- `GET /api/health`
+- `GET /api/systems`
+- `GET /api/search?q=statin&systems=System%20A,System%20D`
+- `GET /api/pubmed?pmids=12345678,23456789`
+- `GET /api/cite?sentence=...&retmax=5`
+
+The search and systems endpoints preserve the response shape used by the
+original viewer. PubMed endpoints call the official NCBI E-utilities service.
 
 ## Local Development
 
@@ -62,7 +71,12 @@ Recommended Vercel settings:
 - Install command: `npm install`
 - Build command: `npm run build`
 - Output directory: Next.js default
-- Environment variables: none required
+- Environment variables: `PUBMED_API_KEY` optional, `CONTACT_EMAIL`
+  recommended, and `TOOL_NAME` optional
+
+The app works without a PubMed API key, subject to NCBI's lower unauthenticated
+request rate. Environment variables must be configured in Vercel, never
+committed to this repository.
 
 For production, merge the preview branch into `main` after reviewing the Vercel
 preview deployment.
