@@ -1,12 +1,28 @@
 {
-  "name": "trec-biogen-taskb-viewer",
-  "version": "1.0.0",
+  "name": "trec-biogen-demo",
+  "version": "2.0.0",
   "private": true,
-  "description": "Static UI + serverless APIs on Vercel to browse and compare Task B answers.",
-  "engines": { "node": ">=18" },
   "scripts": {
-    "dev": "vercel dev",
-    "start": "vercel dev"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
   },
-  "dependencies": {}
+  "dependencies": {
+    "lucide-react": "^1.23.0",
+    "next": "^16.2.10",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.3",
+    "@types/react-dom": "^19.0.2",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "^16.2.10",
+    "typescript": "^5.7.2"
+  },
+  "overrides": {
+    "postcss": "8.5.10"
+  }
 }

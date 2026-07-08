@@ -1,91 +1,68 @@
-# TREC BioGen 2025 — Task B Viewer
+# BioEvidence AI
 
-A lightweight, Vercel-friendly viewer to **search topics** and **compare sentence-level, cited answers** across systems for **BioGen 2025 (Task B: Reference Attribution)**. It supports dark/light theme, tabs/columns layouts, inline PMID chips, and on-demand PubMed details.
+Interactive demo for Ganesh Chandrasekar's public TREC BioGen 2025 Task B
+systems.
 
----
+The site lets reviewers search the official biomedical questions, inspect the
+five submitted answers, compare systems side by side, and trace sentence-level
+citations back to PubMed. It also includes the official shared-task metrics and
+a reserved thesis-release page for systems that are not public yet.
 
-## What’s inside
-- `/public/index.html` — single-page UI (Home / Task / Viewer / Team)
-- `/api/systems.js` — list of systems + descriptions
-- `/api/search.js` — search topics and return answers by system
-- `/api/pubmed.js` — batch PMID → details (title, journal, year, doi, url, abstract)
-- `/data/`
-  - `task_b.json` — topics (`id`, `question`, `topic`, `narrative`)
-  - `System_A_output.jsonl` … `System_E_output.jsonl` — system outputs
-  - `system_descriptions.json` — tooltip text for system chips
+## Demo Contents
 
-> **Tip:** You do **not** need `vercel.json`. Enter via `/` and use the in-app navigation. If you want deep links (e.g., `/viewer`) to work on cold loads, you can add a rewrite later.
+- Search-first explorer for the 30 official Task B questions.
+- Five public system outputs from the submitted TREC BioGen runs.
+- PubMed-linked citation chips for generated answer sentences.
+- Side-by-side comparison mode across systems.
+- Official answer-quality and citation-quality result tables.
+- Release-status page for future thesis systems after defense/publication.
 
----
+## Data
 
-## Quick start (local)
+The current public demo is fully static/precomputed. It does not require private
+API keys, PubMed API access, model checkpoints, GPU inference, or a live
+generation backend.
+
+The Next.js app reads:
+
+- `data/shared-task/topics.json`
+- `data/shared-task/system-a.jsonl`
+- `data/shared-task/system-b.jsonl`
+- `data/shared-task/system-c.jsonl`
+- `data/shared-task/system-d.jsonl`
+- `data/shared-task/system-e.jsonl`
+
+Legacy serverless API files from the earlier static viewer are not required for
+this version and are not included in the new app path.
+
+## Local Development
+
 ```bash
-npm i -g vercel
-vercel dev
-# open http://localhost:3000
+npm install
+npm run dev
 ```
 
-The UI calls `/api/systems`, `/api/search`, and `/api/pubmed`. With `/data` in place, you’ll see results immediately.
+Open `http://localhost:3000`.
 
----
+## Checks
 
-## Deploy to Vercel (no build step)
-1. Push the project to a new GitHub repo.
-2. On https://vercel.com → **New Project** → import the repo → **Deploy** (defaults are fine).
-
-### Optional: clean URLs
-If you need direct links like `/viewer` or `/task` to work when loaded fresh, add a `vercel.json` rewrite to route all paths to `/public/index.html`.
-
----
-
-## Data formats
-
-### `/data/task_b.json`
-```json
-[
-  { "id": "181", "question": "...", "topic": "...", "narrative": "..." }
-]
+```bash
+npm run lint
+npm run build
 ```
 
-### `/data/System_X_output.jsonl`
-Each line = one topic. Any of these shapes are accepted:
-```json
-{"metadata":{"topic_id":"181"},"responses":[
-  { "text": "Sentence 1.", "citations": ["31604329","22802756"] },
-  { "text": "Sentence 2.", "citations": ["30508923"] }
-]}
-```
-```json
-{"id":"181","text":"Full answer text…"}        // UI auto-splits into sentences (no PMIDs)
-```
-```json
-{"id":"181","answer":"Full answer text…"}      // alias for "text"
-```
-If multiple lines exist for the same topic in a system file, the viewer concatenates them as bullets.
+## Deployment
 
----
+This repository is intended to deploy directly on Vercel.
 
-## API (serverless)
+Recommended Vercel settings:
 
-- `GET /api/systems` → `{"systems":[...],"descriptions":{...}}`
-- `GET /api/search?q=<query>&systems=<comma_list>` → matches `id`, `question`, `topic`, `narrative`
-- `GET /api/pubmed?pmids=<comma_list>` → details for PMIDs (title, journal, year, doi, url, abstract)
+- Framework preset: Next.js
+- Root directory: repository root
+- Install command: `npm install`
+- Build command: `npm run build`
+- Output directory: Next.js default
+- Environment variables: none required
 
----
-
-## Team
-- **Ganesh Chandrasekar (cbsag)** — <https://www.linkedin.com/in/cbsag/>
-- **Benjamin Lofo** — <https://www.linkedin.com/in/lamungu/>
-- **Aleksandr Vinokhodov** — <https://www.linkedin.com/in/aleksandr-vinokhodov/>
-
-(Also listed on the in-app **Team** page.)
-
----
-
-## License
-**MIT License** — you’re free to adapt and redistribute this viewer. Replace the license if your project requires a different one.
-
----
-
-## Acknowledgments
-Huge thanks to the **TREC BioGen organizers** and **NIST** for the task specification, datasets, and evaluation framework that made this viewer useful.
+For production, merge the preview branch into `main` after reviewing the Vercel
+preview deployment.
