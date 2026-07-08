@@ -74,6 +74,9 @@ Recommended Vercel settings:
 - Environment variables: `PUBMED_API_KEY` optional, `CONTACT_EMAIL`
   recommended, and `TOOL_NAME` optional
 
+`vercel.json` enforces the Next.js framework preset and clears the legacy
+`public` output-directory setting used by the original static viewer.
+
 The app works without a PubMed API key, subject to NCBI's lower unauthenticated
 request rate. Environment variables must be configured in Vercel, never
 committed to this repository.
