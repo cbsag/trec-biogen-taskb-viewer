@@ -60,6 +60,10 @@ export default function OverviewPage() {
               The shared-task runs compare sparse BM25 retrieval with dense
               MedCPT reranking under narrow and wide evidence budgets.
             </p>
+            <Link className="case-study-link" href="/case-study">
+              Read the technical case study
+              <ArrowRight size={14} aria-hidden="true" />
+            </Link>
           </div>
         </div>
         <div className="shell shared-task-summary" aria-label="Shared-task summary">

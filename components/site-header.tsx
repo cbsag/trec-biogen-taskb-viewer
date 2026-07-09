@@ -8,6 +8,7 @@ import { useEffect, useSyncExternalStore } from "react";
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/shared-task", label: "Explorer" },
+  { href: "/case-study", label: "Study" },
   { href: "/results", label: "Results" },
   { href: "/thesis", label: "Thesis" },
   { href: "/about", label: "About" },

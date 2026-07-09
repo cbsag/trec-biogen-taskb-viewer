@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ExplorerGuide } from "@/components/explorer-guide";
 import { SystemExplorer } from "@/components/system-explorer";
 import { loadSharedTaskTopics } from "@/lib/data";
 
@@ -29,6 +30,7 @@ export default function SharedTaskPage() {
           <SystemExplorer topics={topics} />
         </div>
       </section>
+      <ExplorerGuide />
     </main>
   );
 }
