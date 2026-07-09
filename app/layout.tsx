@@ -31,8 +31,8 @@ export default function RootLayout({
             </div>
             <p>
               Research demo by Ganesh Chandrasekar using precomputed TREC
-              BioGen runs with PubMed-linked evidence. For exploration only,
-              not clinical guidance.
+              BioGen runs with PubMed-linked evidence.
+              <span>For exploration only, not clinical guidance.</span>
             </p>
           </div>
         </footer>
