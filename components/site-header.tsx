@@ -93,11 +93,12 @@ export function SiteHeader() {
         <div className="header-actions">
           <a
             className="header-link"
-            href="https://github.com/cbsag"
+            href="https://cbsag.me"
             target="_blank"
             rel="noreferrer"
+            aria-label="Open Ganesh Chandrasekar portfolio"
           >
-            GitHub
+            <span>Portfolio</span>
             <ExternalLink size={14} aria-hidden="true" />
           </a>
           <button
